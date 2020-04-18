@@ -55,6 +55,7 @@ public class GUI extends JFrame {
     private JTextField txtBetrag_b;
     private JTable tableErgebnis;
     private JTextField umsatzErgebnis;
+    private JTextField txtSearchQuery;
     
     public GUI(WordDocument dokument) {
     	initialize(dokument);
@@ -297,7 +298,7 @@ public class GUI extends JFrame {
 		
 		tableErgebnis = new JTable();
 		JScrollPane scrollPane = new JScrollPane(tableErgebnis);
-		scrollPane.setBounds(10, 42, 749, 450);
+		scrollPane.setBounds(10, 76, 749, 450);
 		Suchen.add(scrollPane);
 		
 		String[] monate = {"Januar", "Februar", "März", "April", "Mai", "Juni","Juli", "Augusut","September","Oktober","November","Dezember"};
@@ -347,6 +348,27 @@ public class GUI extends JFrame {
 		});
 		btnPfeil.setBounds(573, 540, 52, 23);
 		Suchen.add(btnPfeil);
+		
+		JButton btnQuery = new JButton("Query");
+		btnQuery.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tableErgebnis.setModel(DbUtils.resultSetToTableModel(dbVerbindung.searchByQuery(txtSearchQuery.getText(), Suchen)));
+			}
+		});
+		btnQuery.setBounds(543, 42, 89, 23);
+		Suchen.add(btnQuery);
+		
+		txtSearchQuery = new JTextField();
+		txtSearchQuery.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					btnQuery.doClick();
+			}
+		});
+		txtSearchQuery.setBounds(10, 42, 523, 20);
+		Suchen.add(txtSearchQuery);
+		txtSearchQuery.setColumns(10);
 		
 		bearbeiten = new JPanel();
 		tabbedPane.addTab("Bearbeiten", null, bearbeiten, null);

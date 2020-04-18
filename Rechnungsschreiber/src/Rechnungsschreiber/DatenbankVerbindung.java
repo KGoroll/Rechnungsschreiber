@@ -200,14 +200,14 @@ public class DatenbankVerbindung {
 		PreparedStatement statement;
 	        try {
 	        	if (sucheNach.isEmpty()) {
-	            	String query = "select rechnungsnr,leistungszeitraum,rechdatum,kundennr,bauvorhaben,betrag,beschreibung from rechnung";
+	            	String query = "select rechnungsnr,leistungszeitraum as KW,rechdatum,kundennr,bauvorhaben,betrag,beschreibung from rechnung order by rechnungsnr";
 	            	Statement stmt = conn.createStatement();
 	            	ResultSet rs = stmt.executeQuery(query);
 	            	return rs;
 	        	}
 	        	
-	            statement = conn.prepareStatement("select rechnungsnr,leistungszeitraum,rechdatum,kundennr,bauvorhaben,betrag,beschreibung"
-	            		+ " from rechnung where Bauvorhaben like ? or Kundennr like ? or Leistungszeitraum like ? or beschreibung like ?");
+	            statement = conn.prepareStatement("select rechnungsnr,leistungszeitraum as KW,rechdatum,kundennr,bauvorhaben,betrag,beschreibung"
+	            		+ " from rechnung where Bauvorhaben like ? or Kundennr like ? or Leistungszeitraum like ? or beschreibung like ? order by rechnungsnr");
 	            statement.setString(1, "%" + sucheNach + "%");
 	            statement.setString(2, "%" + sucheNach + "%");
 	            statement.setString(3, "%" + sucheNach + "%");
@@ -307,5 +307,16 @@ public class DatenbankVerbindung {
 		}
 		
 		return 0;
+	}
+
+	public ResultSet searchByQuery(String query, JPanel suchen) {
+		Statement stmt = null;
+		
+		try {
+			stmt = conn.createStatement();
+			return stmt.executeQuery(query);
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
 	}
 }
