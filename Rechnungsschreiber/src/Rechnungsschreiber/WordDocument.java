@@ -15,6 +15,7 @@ public class WordDocument {
 	private String absoluteFilePath;
 	private String fileDirectory;
 	private RechnungsInfo daten;
+	private TemplateInfo templateDaten;
 	
 	WordDocument(RechnungsInfo daten){
 		this.daten = daten;
@@ -56,6 +57,10 @@ public class WordDocument {
         fileDirectory = finalFile.getParent();
         
         System.out.println("finished creating Word document");
+    }
+    
+    public void generateNewTemplate() {
+    	
     }
     
     public String getDocxAbsoulteFilePath () {

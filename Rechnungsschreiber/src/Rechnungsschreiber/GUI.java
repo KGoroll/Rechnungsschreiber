@@ -56,6 +56,11 @@ public class GUI extends JFrame {
     private JTable tableErgebnis;
     private JTextField umsatzErgebnis;
     private JTextField txtSearchQuery;
+    private JTextField txtNeueKundennummer;
+    private JTextField txtNeuerKundeName;
+    private JTextField txtNeuerKundeStraße;
+    private JTextField txtNeuerKundePlz;
+    private JTextField txtNeuerKundeOrt;
     
     public GUI(WordDocument dokument) {
     	initialize(dokument);
@@ -469,5 +474,79 @@ public class GUI extends JFrame {
 		
 		JPanel neuerKunde = new JPanel();
 		tabbedPane.addTab("Neuer Kunde", null, neuerKunde, null);
+		neuerKunde.setLayout(null);
+		
+		JLabel lblNeueKundennummer = new JLabel("Kundennummer");
+		lblNeueKundennummer.setBounds(32, 11, 106, 14);
+		neuerKunde.add(lblNeueKundennummer);
+		
+		txtNeueKundennummer = new JTextField();
+		txtNeueKundennummer.setBounds(32, 24, 312, 20);
+		neuerKunde.add(txtNeueKundennummer);
+		txtNeueKundennummer.setColumns(10);
+		
+		JLabel lblName = new JLabel("Name");
+		lblName.setBounds(32, 115, 106, 14);
+		neuerKunde.add(lblName);
+		
+		txtNeuerKundeName = new JTextField();
+		txtNeuerKundeName.setBounds(32, 140, 312, 20);
+		neuerKunde.add(txtNeuerKundeName);
+		txtNeuerKundeName.setColumns(10);
+		
+		JLabel lblKundenStraße = new JLabel("Straße");
+		lblKundenStraße.setBounds(32, 171, 46, 14);
+		neuerKunde.add(lblKundenStraße);
+		
+		txtNeuerKundeStraße = new JTextField();
+		txtNeuerKundeStraße.setBounds(32, 196, 312, 20);
+		neuerKunde.add(txtNeuerKundeStraße);
+		txtNeuerKundeStraße.setColumns(10);
+		
+		JLabel lblPlz = new JLabel("PLZ");
+		lblPlz.setBounds(32, 227, 46, 14);
+		neuerKunde.add(lblPlz);
+		
+		JLabel lblOrt = new JLabel("Ort");
+		lblOrt.setBounds(32, 283, 46, 14);
+		neuerKunde.add(lblOrt);
+		
+		txtNeuerKundePlz = new JTextField();
+		txtNeuerKundePlz.setBounds(32, 252, 312, 20);
+		neuerKunde.add(txtNeuerKundePlz);
+		txtNeuerKundePlz.setColumns(10);
+		
+		txtNeuerKundeOrt = new JTextField();
+		txtNeuerKundeOrt.setBounds(32, 308, 312, 20);
+		neuerKunde.add(txtNeuerKundeOrt);
+		txtNeuerKundeOrt.setColumns(10);
+		
+		JButton btnNeu = new JButton("Neu");
+		btnNeu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TemplateInfo neueRechnung = new TemplateInfo();
+				neueRechnung.setKundennummer(txtNeueKundennummer.getText());
+				neueRechnung.setKundenname(txtNeuerKundeName.getText());
+				neueRechnung.setKundenStraße(txtNeuerKundeStraße.getText());
+				neueRechnung.setKundenPlz(txtNeuerKundePlz.getText());
+				neueRechnung.setKundenOrt(txtNeuerKundeOrt.getText());
+				//TODO
+				//neueRechnung.setIsFirma());
+			}
+		});
+		btnNeu.setBounds(36, 373, 89, 23);
+		neuerKunde.add(btnNeu);
+		
+		JButton btnÖffneVorlage = new JButton("Öffne Vorlage");
+		btnÖffneVorlage.setBounds(237, 373, 106, 23);
+		neuerKunde.add(btnÖffneVorlage);
+		
+		JRadioButton rdbtnNeuerKundeFirma = new JRadioButton("Firma");
+		rdbtnNeuerKundeFirma.setBounds(29, 62, 109, 23);
+		neuerKunde.add(rdbtnNeuerKundeFirma);
+		
+		JRadioButton rdbtnNuerKundePrivat = new JRadioButton("Privat");
+		rdbtnNuerKundePrivat.setBounds(154, 62, 109, 23);
+		neuerKunde.add(rdbtnNuerKundePrivat);
 	}
 }
