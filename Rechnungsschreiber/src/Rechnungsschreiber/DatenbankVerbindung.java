@@ -319,4 +319,21 @@ public class DatenbankVerbindung {
 			throw new Error("Problem", e);
 		}
 	}
+
+	public void insertNewKunde(TemplateInfo neueVorlage, String templatePath) {
+		Statement stmt = null;
+		String Query = "insert into Kunde values('"+neueVorlage.getKundennummer()+"','"+neueVorlage.getKundenname()+"','"+neueVorlage.getKundenStraße()+"',"
+				+ "'"+neueVorlage.getKundenPlz()+"','"+neueVorlage.getKundenOrt()+"','"+templatePath+"')";	
+		try {
+			stmt = conn.createStatement();
+			int m = stmt.executeUpdate(Query);	
+			if(m == 1)
+				System.out.println("inserted Row to Rechnung:" + Query);
+			else
+				System.out.println("insertion failed");
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
+	}
+		
 }

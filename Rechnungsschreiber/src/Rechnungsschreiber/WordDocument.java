@@ -1,4 +1,5 @@
 package Rechnungsschreiber;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import java.io.File;
@@ -9,9 +10,9 @@ import org.docx4j.model.datastorage.migration.VariablePrepare;
 
 public class WordDocument {
 
-	private static String TEMPLATE = "Rechnung_vorlage.docx";
-	private static final String TEMPLATE_FIRMA = "Rechnung_Firma_vorlage.docx";
-	private static final String TEMPLATE_PRIVAT = "Rechnung_Privat_vorlage.docx";
+	private static String TEMPLATE;
+	private static final String TEMPLATE_FIRMA = "Rechnung_Firma_vorlage_Allgemein.docx";
+	private static final String TEMPLATE_PRIVAT = "Rechnung_Privat_vorlage_Allgemein.docx";
 	private String absoluteFilePath;
 	private String fileDirectory;
 	private RechnungsInfo daten;
@@ -59,8 +60,36 @@ public class WordDocument {
         System.out.println("finished creating Word document");
     }
     
-    public void generateNewTemplate() {
-    	
+    public String generateNewTemplate(TemplateInfo neueVorlage) throws Exception {
+    	InputStream templateInputStream;
+    	if (neueVorlage.getIsFirma() == true) {
+    		templateInputStream = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE_FIRMA);
+    	}	
+    	else {
+    		templateInputStream = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE_PRIVAT);
+    	}
+    		
+    	WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(templateInputStream);
+
+        MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
+
+        VariablePrepare.prepare(wordMLPackage);
+
+        HashMap<String, String> variables = new HashMap<>();
+        variables.put("name", neueVorlage.getKundenname());
+        variables.put("straße", neueVorlage.getKundenStraße());
+        variables.put("plz", neueVorlage.getKundenPlz());
+        variables.put("ort", neueVorlage.getKundenOrt());
+        variables.put("kundennummer", neueVorlage.getKundennummer());
+        
+        documentPart.variableReplace(variables);
+        
+        File finalTemplate = new File("D:\\Benutzer\\Desktop\\Rechnungen\\Vorlagen\\Vorlage " + neueVorlage.getKundennummer() + ".docx");
+        Docx4J.save(wordMLPackage, finalTemplate,0);
+        
+        System.out.println("finished creating new Template " + neueVorlage.getKundennummer());
+        
+        return finalTemplate.getAbsolutePath();
     }
     
     public String getDocxAbsoulteFilePath () {

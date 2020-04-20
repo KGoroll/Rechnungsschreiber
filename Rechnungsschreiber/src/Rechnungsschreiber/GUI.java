@@ -521,17 +521,31 @@ public class GUI extends JFrame {
 		neuerKunde.add(txtNeuerKundeOrt);
 		txtNeuerKundeOrt.setColumns(10);
 		
+		JRadioButton rdbtnNeuerKundeFirma = new JRadioButton("Firma");
+		rdbtnNeuerKundeFirma.setBounds(29, 62, 109, 23);
+		neuerKunde.add(rdbtnNeuerKundeFirma);
+		
 		JButton btnNeu = new JButton("Neu");
 		btnNeu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TemplateInfo neueRechnung = new TemplateInfo();
-				neueRechnung.setKundennummer(txtNeueKundennummer.getText());
-				neueRechnung.setKundenname(txtNeuerKundeName.getText());
-				neueRechnung.setKundenStraße(txtNeuerKundeStraße.getText());
-				neueRechnung.setKundenPlz(txtNeuerKundePlz.getText());
-				neueRechnung.setKundenOrt(txtNeuerKundeOrt.getText());
-				//TODO
-				//neueRechnung.setIsFirma());
+				TemplateInfo neueVorlage = new TemplateInfo();
+				
+				neueVorlage.setKundennummer(txtNeueKundennummer.getText());
+				neueVorlage.setKundenname(txtNeuerKundeName.getText());
+				neueVorlage.setKundenStraße(txtNeuerKundeStraße.getText());
+				neueVorlage.setKundenPlz(txtNeuerKundePlz.getText());
+				neueVorlage.setKundenOrt(txtNeuerKundeOrt.getText());
+				neueVorlage.setIsFirma(rdbtnNeuerKundeFirma.isSelected());
+				
+				String TemplatePath = new String();
+				try {
+					TemplatePath = dokument.generateNewTemplate(neueVorlage);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				dbVerbindung.insertNewKunde(neueVorlage,TemplatePath);
 			}
 		});
 		btnNeu.setBounds(36, 373, 89, 23);
@@ -541,12 +555,12 @@ public class GUI extends JFrame {
 		btnÖffneVorlage.setBounds(237, 373, 106, 23);
 		neuerKunde.add(btnÖffneVorlage);
 		
-		JRadioButton rdbtnNeuerKundeFirma = new JRadioButton("Firma");
-		rdbtnNeuerKundeFirma.setBounds(29, 62, 109, 23);
-		neuerKunde.add(rdbtnNeuerKundeFirma);
+		JRadioButton rdbtnNeuerKundePrivat = new JRadioButton("Privat");
+		rdbtnNeuerKundePrivat.setBounds(154, 62, 109, 23);
+		neuerKunde.add(rdbtnNeuerKundePrivat);
 		
-		JRadioButton rdbtnNuerKundePrivat = new JRadioButton("Privat");
-		rdbtnNuerKundePrivat.setBounds(154, 62, 109, 23);
-		neuerKunde.add(rdbtnNuerKundePrivat);
+		ButtonGroup NeuerKundeButtons = new ButtonGroup();
+		NeuerKundeButtons.add(rdbtnNeuerKundeFirma);
+		NeuerKundeButtons.add(rdbtnNeuerKundePrivat);
 	}
 }
