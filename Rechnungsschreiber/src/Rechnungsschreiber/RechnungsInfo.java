@@ -2,7 +2,8 @@ package Rechnungsschreiber;
 import java.util.Scanner;
 
 public class RechnungsInfo{
-
+	
+	private String kundennummer;
     private String rechnungsNr;
     private String datum;
     private String woche;
@@ -88,6 +89,14 @@ public class RechnungsInfo{
 		brutto = String.format("%.2f", Float.parseFloat(betrag)*0.19 + Float.parseFloat(betrag));
 	}
 	
+	public String getKundennummer() {
+		return kundennummer;
+	}
+
+	public void setKundennummer(String kundennummer) {
+		this.kundennummer = kundennummer;
+	}
+
 	public String getMwst() {
 		return mwst;
 	}

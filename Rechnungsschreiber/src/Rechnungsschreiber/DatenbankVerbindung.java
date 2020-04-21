@@ -319,8 +319,27 @@ public class DatenbankVerbindung {
 			throw new Error("Problem", e);
 		}
 	}
+	
+	public HashMap<String,String> retrieveKundennameUndNummer(){
+		HashMap<String,String> Map = new HashMap<String,String>();
+		
+		Statement stmt = null;
+		String query = "select kundenname,kundennummer from kunde";
+		ResultSet rs;
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				Map.put(rs.getString(1),rs.getString(2));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return Map;
+	}
 
-	public void insertNewKunde(TemplateInfo neueVorlage, String templatePath) {
+	/*public void insertNewKunde(TemplateInfo neueVorlage, String templatePath) {
 		Statement stmt = null;
 		String Query = "insert into Kunde values('"+neueVorlage.getKundennummer()+"','"+neueVorlage.getKundenname()+"','"+neueVorlage.getKundenStraße()+"',"
 				+ "'"+neueVorlage.getKundenPlz()+"','"+neueVorlage.getKundenOrt()+"','"+templatePath+"')";	
@@ -334,6 +353,6 @@ public class DatenbankVerbindung {
 		} catch (SQLException e) {
 			System.err.println(e);
 		}
-	}
+	} */
 		
 }

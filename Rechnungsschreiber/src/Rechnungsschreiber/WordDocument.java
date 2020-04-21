@@ -16,7 +16,6 @@ public class WordDocument {
 	private String absoluteFilePath;
 	private String fileDirectory;
 	private RechnungsInfo daten;
-	private TemplateInfo templateDaten;
 	
 	WordDocument(RechnungsInfo daten){
 		this.daten = daten;
@@ -60,7 +59,7 @@ public class WordDocument {
         System.out.println("finished creating Word document");
     }
     
-    public String generateNewTemplate(TemplateInfo neueVorlage) throws Exception {
+    public void generateNewTemplate(TemplateInfo neueVorlage) throws Exception {
     	InputStream templateInputStream;
     	if (neueVorlage.getIsFirma() == true) {
     		templateInputStream = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE_FIRMA);
@@ -87,9 +86,8 @@ public class WordDocument {
         File finalTemplate = new File("D:\\Benutzer\\Desktop\\Rechnungen\\Vorlagen\\Vorlage " + neueVorlage.getKundennummer() + ".docx");
         Docx4J.save(wordMLPackage, finalTemplate,0);
         
-        System.out.println("finished creating new Template " + neueVorlage.getKundennummer());
+        System.out.println("finished creating new Template " + neueVorlage.getKundennummer() + " " + neueVorlage.getKundenname());
         
-        return finalTemplate.getAbsolutePath();
     }
     
     public String getDocxAbsoulteFilePath () {

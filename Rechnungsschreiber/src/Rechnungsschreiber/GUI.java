@@ -17,6 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JProgressBar;
@@ -130,6 +133,13 @@ public class GUI extends JFrame {
 			dbVerbindung.insertNeueRechnung(dokument,convert);	
 	}
     
+    public void addItems(JComboBox comboBox) {
+    	HashMap<String,String> KundenNameNummer = dbVerbindung.retrieveKundennameUndNummer();
+    	for(Map.Entry m : KundenNameNummer.entrySet()) {
+    		comboBox.addItem(m.getKey());
+    	}
+    }
+    
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void initialize(WordDocument dokument) {
 		dbVerbindung = new DatenbankVerbindung();
@@ -168,7 +178,7 @@ public class GUI extends JFrame {
 		NeueRechnung.add(btnffnen);
 		
 		JRadioButton rdbtnPrivat = new JRadioButton("Privat");
-		rdbtnPrivat.setBounds(218, 29, 79, 23);
+		rdbtnPrivat.setBounds(319, 100, 79, 23);
 		NeueRechnung.add(rdbtnPrivat);
 		rdbtnPrivat.setSelected(true);
 		rdbtnPrivat.addActionListener(new ActionListener() {
@@ -180,7 +190,7 @@ public class GUI extends JFrame {
 		
 		
 		JRadioButton rdbtnFirma = new JRadioButton("Firma");
-		rdbtnFirma.setBounds(137, 29, 79, 23);
+		rdbtnFirma.setBounds(238, 100, 79, 23);
 		NeueRechnung.add(rdbtnFirma);
 		rdbtnFirma.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -252,6 +262,18 @@ public class GUI extends JFrame {
 		NeueRechnung.add(txtRechnungsnummer);
 		txtRechnungsnummer.setText(dbVerbindung.retrieveMaxRechnungsnummer());
 		txtRechnungsnummer.setColumns(10);
+		
+		JLabel lblKunde = new JLabel("Kunde");
+		lblKunde.setBounds(178, 11, 110, 14);
+		NeueRechnung.add(lblKunde);
+		
+		
+		JComboBox comboBox = new JComboBox();
+		comboBox.setBounds(178, 29, 220, 21);
+		NeueRechnung.add(comboBox);
+		
+		addItems(comboBox);
+		
 		btnFertig.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				progressBar.setValue(0);
@@ -537,15 +559,13 @@ public class GUI extends JFrame {
 				neueVorlage.setKundenOrt(txtNeuerKundeOrt.getText());
 				neueVorlage.setIsFirma(rdbtnNeuerKundeFirma.isSelected());
 				
-				String TemplatePath = new String();
 				try {
-					TemplatePath = dokument.generateNewTemplate(neueVorlage);
+					dokument.generateNewTemplate(neueVorlage);
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
-				dbVerbindung.insertNewKunde(neueVorlage,TemplatePath);
+				//dbVerbindung.insertNewKunde(neueVorlage,TemplatePath);
 			}
 		});
 		btnNeu.setBounds(36, 373, 89, 23);
