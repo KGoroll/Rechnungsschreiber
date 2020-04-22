@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
@@ -64,6 +65,7 @@ public class GUI extends JFrame {
     private JTextField txtNeuerKundeStraße;
     private JTextField txtNeuerKundePlz;
     private JTextField txtNeuerKundeOrt;
+    private JComboBox<Map.Entry<String,String>> comboBox;
     
     public GUI(WordDocument dokument) {
     	initialize(dokument);
@@ -114,7 +116,8 @@ public class GUI extends JFrame {
     	dbVerbindung.insertNeueRechnung(dokument, convert);
     }
     
-    public void fertigstellen(WordDocument dokument) {
+    @SuppressWarnings("unchecked")
+	public void fertigstellen(WordDocument dokument) {
     	
 		dokument.getRechnungsDaten().setRechnungsNr(txtRechnungsnummer.getText());
 		dokument.getRechnungsDaten().setDatum(txtRechnungsDatum.getText());
@@ -122,21 +125,22 @@ public class GUI extends JFrame {
 		dokument.getRechnungsDaten().setBauvorhaben(txtBauvorhaben.getText());
 		dokument.getRechnungsDaten().setBetrag(txtBetrag.getText());
 		dokument.getRechnungsDaten().setBeschreibung(txtBeschreibung.getText());
+		dokument.getRechnungsDaten().setKundennummer(((Entry<String,String>) comboBox.getSelectedItem()).getValue());
 		
 		try {
 			dokument.generateDocxFileFromTemplate();
-			convert = new Convert(dokument);
+			//convert = new Convert(dokument);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} 
-			dbVerbindung.insertNeueRechnung(dokument,convert);	
+			//dbVerbindung.insertNeueRechnung(dokument,convert);	
 	}
     
-    public void addItems(JComboBox comboBox) {
+    public void addItems(JComboBox<Map.Entry<String,String>> comboBox) {
     	HashMap<String,String> KundenNameNummer = dbVerbindung.retrieveKundennameUndNummer();
-    	for(Map.Entry m : KundenNameNummer.entrySet()) {
-    		comboBox.addItem(m.getKey());
+    	for(Map.Entry<String,String> m : KundenNameNummer.entrySet()) {
+    		comboBox.addItem(m);
     	}
     }
     
@@ -268,8 +272,8 @@ public class GUI extends JFrame {
 		NeueRechnung.add(lblKunde);
 		
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setBounds(178, 29, 220, 21);
+		comboBox = new JComboBox();
+		comboBox.setBounds(178, 29, 319, 21);
 		NeueRechnung.add(comboBox);
 		
 		addItems(comboBox);

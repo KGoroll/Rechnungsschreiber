@@ -23,15 +23,12 @@ public class WordDocument {
 	
     public void generateDocxFileFromTemplate() throws Exception {
     	
-    	if (daten.getRechnungsartIsFirma() == true) {
-    		TEMPLATE = TEMPLATE_FIRMA;
-    	}
-    	else {
-    		TEMPLATE = TEMPLATE_PRIVAT;
-    	}
+    	TEMPLATE = "D:\\Benutzer\\Desktop\\Rechnungen\\Vorlagen\\Vorlage " + daten.getKundennummer() + ".docx";
+    	System.out.println(TEMPLATE);
     	
-        InputStream templateInputStream = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE);
-
+    	//TODO fix this
+    	InputStream templateInputStream = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE);
+    	
         WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(templateInputStream);
 
         MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
