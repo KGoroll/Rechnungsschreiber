@@ -65,10 +65,31 @@ public class GUI extends JFrame {
     private JTextField txtNeuerKundeStraße;
     private JTextField txtNeuerKundePlz;
     private JTextField txtNeuerKundeOrt;
-    private JComboBox<Map.Entry<String,String>> comboBox;
+    private JComboBox<Entry<String,String>> comboBox;
+    private JRadioButton rdbtnNeuerKundeFirma;
+    private JComboBox<Entry<String, String>> comboBox_1;
     
     public GUI(WordDocument dokument) {
     	initialize(dokument);
+    }
+    
+    private void addNewTemplate(WordDocument dokument) {
+    	TemplateInfo neueVorlage = new TemplateInfo();
+		
+		neueVorlage.setKundennummer(txtNeueKundennummer.getText());
+		neueVorlage.setKundenname(txtNeuerKundeName.getText());
+		neueVorlage.setKundenStraße(txtNeuerKundeStraße.getText());
+		neueVorlage.setKundenPlz(txtNeuerKundePlz.getText());
+		neueVorlage.setKundenOrt(txtNeuerKundeOrt.getText());
+		neueVorlage.setIsFirma(rdbtnNeuerKundeFirma.isSelected());
+		
+		try {
+			dokument.generateNewTemplate(neueVorlage);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		//dbVerbindung.insertNewKunde(neueVorlage,TemplatePath);
     }
     
     public void populateBearbeitenFeld(){
@@ -79,6 +100,9 @@ public class GUI extends JFrame {
     	  txtBauvorhaben_b.setText(doc.getRechnungsDaten().getBauvorhaben());
     	  txtBeschreibung_b.setText(doc.getRechnungsDaten().getBeschreibung());
     	  txtBetrag_b.setText(doc.getRechnungsDaten().getBetrag());
+    	  
+    	  comboBox_1.removeAllItems();
+    	  addItems(comboBox_1);
     }
     
     public void bearbeiten(WordDocument dokument) {
@@ -129,17 +153,17 @@ public class GUI extends JFrame {
 		
 		try {
 			dokument.generateDocxFileFromTemplate();
-			//convert = new Convert(dokument);
+			convert = new Convert(dokument);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} 
-			//dbVerbindung.insertNeueRechnung(dokument,convert);	
+			dbVerbindung.insertNeueRechnung(dokument,convert);	
 	}
     
-    public void addItems(JComboBox<Map.Entry<String,String>> comboBox) {
+    public void addItems(JComboBox<Entry<String,String>> comboBox) {
     	HashMap<String,String> KundenNameNummer = dbVerbindung.retrieveKundennameUndNummer();
-    	for(Map.Entry<String,String> m : KundenNameNummer.entrySet()) {
+    	for(Entry<String,String> m : KundenNameNummer.entrySet()) {
     		comboBox.addItem(m);
     	}
     }
@@ -158,7 +182,6 @@ public class GUI extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		ButtonGroup RechnungsArt = new ButtonGroup();
 		ButtonGroup RechnungsArt_b = new ButtonGroup();
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -180,28 +203,6 @@ public class GUI extends JFrame {
 		JButton btnffnen = new JButton("Öffnen");
 		btnffnen.setBounds(137, 404, 96, 23);
 		NeueRechnung.add(btnffnen);
-		
-		JRadioButton rdbtnPrivat = new JRadioButton("Privat");
-		rdbtnPrivat.setBounds(319, 100, 79, 23);
-		NeueRechnung.add(rdbtnPrivat);
-		rdbtnPrivat.setSelected(true);
-		rdbtnPrivat.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dokument.getRechnungsDaten().setRechnungsartIsFirma(false);
-			}
-		});
-		RechnungsArt.add(rdbtnPrivat);
-		
-		
-		JRadioButton rdbtnFirma = new JRadioButton("Firma");
-		rdbtnFirma.setBounds(238, 100, 79, 23);
-		NeueRechnung.add(rdbtnFirma);
-		rdbtnFirma.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dokument.getRechnungsDaten().setRechnungsartIsFirma(true);
-			}
-		});
-		RechnungsArt.add(rdbtnFirma);
 		
 		txtBetrag = new JTextField();
 		txtBetrag.setBounds(10, 323, 86, 20);
@@ -498,6 +499,10 @@ public class GUI extends JFrame {
 		btnBearbeiten.setBounds(10, 358, 89, 23);
 		bearbeiten.add(btnBearbeiten);
 		
+		comboBox_1 = new JComboBox();
+		comboBox_1.setBounds(139, 77, 310, 21);
+		bearbeiten.add(comboBox_1);
+		
 		JPanel neuerKunde = new JPanel();
 		tabbedPane.addTab("Neuer Kunde", null, neuerKunde, null);
 		neuerKunde.setLayout(null);
@@ -547,29 +552,14 @@ public class GUI extends JFrame {
 		neuerKunde.add(txtNeuerKundeOrt);
 		txtNeuerKundeOrt.setColumns(10);
 		
-		JRadioButton rdbtnNeuerKundeFirma = new JRadioButton("Firma");
+		rdbtnNeuerKundeFirma = new JRadioButton("Firma");
 		rdbtnNeuerKundeFirma.setBounds(29, 62, 109, 23);
 		neuerKunde.add(rdbtnNeuerKundeFirma);
 		
 		JButton btnNeu = new JButton("Neu");
 		btnNeu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TemplateInfo neueVorlage = new TemplateInfo();
-				
-				neueVorlage.setKundennummer(txtNeueKundennummer.getText());
-				neueVorlage.setKundenname(txtNeuerKundeName.getText());
-				neueVorlage.setKundenStraße(txtNeuerKundeStraße.getText());
-				neueVorlage.setKundenPlz(txtNeuerKundePlz.getText());
-				neueVorlage.setKundenOrt(txtNeuerKundeOrt.getText());
-				neueVorlage.setIsFirma(rdbtnNeuerKundeFirma.isSelected());
-				
-				try {
-					dokument.generateNewTemplate(neueVorlage);
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				//dbVerbindung.insertNewKunde(neueVorlage,TemplatePath);
+				addNewTemplate(dokument);
 			}
 		});
 		btnNeu.setBounds(36, 373, 89, 23);

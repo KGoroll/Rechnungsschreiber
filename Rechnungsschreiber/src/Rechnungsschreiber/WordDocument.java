@@ -3,7 +3,9 @@ import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import org.docx4j.Docx4J;
 import org.docx4j.model.datastorage.migration.VariablePrepare;
@@ -24,10 +26,9 @@ public class WordDocument {
     public void generateDocxFileFromTemplate() throws Exception {
     	
     	TEMPLATE = "D:\\Benutzer\\Desktop\\Rechnungen\\Vorlagen\\Vorlage " + daten.getKundennummer() + ".docx";
-    	System.out.println(TEMPLATE);
     	
-    	//TODO fix this
-    	InputStream templateInputStream = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE);
+    	//InputStream templateInputStream = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE);
+    	InputStream templateInputStream = new FileInputStream(TEMPLATE);
     	
         WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(templateInputStream);
 
