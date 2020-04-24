@@ -5,7 +5,7 @@ import java.nio.file.Files;
 
 public class Convert{
 	  
-	  private  String pathToExe = "D:\\Program Files\\eclipse\\eclipse-workspace\\Rechnungsschreiber\\resources\\OfficeToPDF.exe";
+	  private  static final String pathToExe = "C:\\Users\\Krzysztof\\git\\Rechnungsschreiber\\Rechnungsschreiber\\resources\\OfficeToPDF.exe";
 	  private  String pathToTemplate;
 	  private  String pathToOutput;
 	  private  WordDocument dokument;
@@ -19,9 +19,9 @@ public class Convert{
 	  
 	  public void runConvert() {
 		System.out.println("Started Converting");
-		pathToTemplate = dokument.getFileDirectory() + "\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".docx";
+		pathToTemplate = dokument.getDocxAbsoulteFilePath();
 		pathToOutput = dokument.getFileDirectory() + "\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".pdf";		
-		
+
 	    try {
 			process = new ProcessBuilder(pathToExe, pathToTemplate, pathToOutput).start();
 		} catch (IOException e) {
@@ -38,14 +38,7 @@ public class Convert{
 	    System.out.println("Result of Office processing: " + process.exitValue());
 
 	    File file = new File(pathToOutput);
-		try {
-			fileContent = Files.readAllBytes(file.toPath());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	    System.out.println(fileContent.length);
+		
 	  }
 	  
 	  public String getPathToPdf() {

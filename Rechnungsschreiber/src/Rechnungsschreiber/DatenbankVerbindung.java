@@ -49,19 +49,14 @@ public class DatenbankVerbindung {
 	int RechNr = Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr());
 	String LeistungsZeitr = dokument.getRechnungsDaten().getWoche();
 	String RechDatum = dokument.getRechnungsDaten().getDatum();
-	//String KundenNr = dokument.getRechnungsDaten().get
+	String Kundennummer = dokument.getRechnungsDaten().getKundennummer();
 	String Bauvorhaben = dokument.getRechnungsDaten().getBauvorhaben();
 	float Betrag = Float.parseFloat(dokument.getRechnungsDaten().getBetrag().replace(',', '.'));
 	String PdfDatei = convert.getPathToPdf();
 	String WordDatei = convert.getPathToWord();
 	String Beschreibung = dokument.getRechnungsDaten().getBeschreibung();
-	
-	String kundennummer = new String();
-	if(dokument.getRechnungsDaten().getRechnungsartIsFirma() == true)
-		kundennummer = "0001";
-	else
-		kundennummer = "0002";
-	String insertQuery = "insert into Rechnung values("+RechNr+",'"+LeistungsZeitr+"','"+RechDatum+"','"+kundennummer+"','"+Bauvorhaben+"',"+Betrag+",'"+PdfDatei+"','"+WordDatei+"','"+Beschreibung+"')";	
+
+	String insertQuery = "insert into Rechnung values("+RechNr+",'"+LeistungsZeitr+"','"+RechDatum+"','"+Kundennummer+"','"+Bauvorhaben+"',"+Betrag+",'"+PdfDatei+"','"+WordDatei+"','"+Beschreibung+"')";	
 		try {
 			stmt = conn.createStatement();
 			int m = stmt.executeUpdate(insertQuery);	
@@ -294,8 +289,6 @@ public class DatenbankVerbindung {
 		
 		Statement stmt = null;
 		try {
-			System.out.println(query);
-			
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query.toString());
 			rs.next();
@@ -339,10 +332,10 @@ public class DatenbankVerbindung {
 		return Map;
 	}
 
-	/*public void insertNewKunde(TemplateInfo neueVorlage, String templatePath) {
+	public void insertNewKunde(TemplateInfo neueVorlage) {
 		Statement stmt = null;
 		String Query = "insert into Kunde values('"+neueVorlage.getKundennummer()+"','"+neueVorlage.getKundenname()+"','"+neueVorlage.getKundenStraße()+"',"
-				+ "'"+neueVorlage.getKundenPlz()+"','"+neueVorlage.getKundenOrt()+"','"+templatePath+"')";	
+				+ "'"+neueVorlage.getKundenPlz()+"','"+neueVorlage.getKundenOrt()+"')";	
 		try {
 			stmt = conn.createStatement();
 			int m = stmt.executeUpdate(Query);	
@@ -353,6 +346,6 @@ public class DatenbankVerbindung {
 		} catch (SQLException e) {
 			System.err.println(e);
 		}
-	} */
+	} 
 		
 }

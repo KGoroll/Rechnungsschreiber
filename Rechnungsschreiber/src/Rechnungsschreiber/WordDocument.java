@@ -1,11 +1,9 @@
 package Rechnungsschreiber;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
 import org.docx4j.Docx4J;
 import org.docx4j.model.datastorage.migration.VariablePrepare;
@@ -53,7 +51,7 @@ public class WordDocument {
         
         absoluteFilePath = finalFile.getAbsolutePath();
         fileDirectory = finalFile.getParent();
-        
+
         System.out.println("finished creating Word document");
     }
     

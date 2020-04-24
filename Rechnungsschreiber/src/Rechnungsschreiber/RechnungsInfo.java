@@ -12,7 +12,6 @@ public class RechnungsInfo{
     private String betrag;
     private String mwst;
     private String brutto;
-    private boolean isFirma;
     
     public void setInfo() {
     	Scanner in = new Scanner (System.in);
@@ -111,14 +110,6 @@ public class RechnungsInfo{
 
 	public void setBrutto(String brutto) {
 		this.brutto = brutto;
-	}
-
-	public void setRechnungsartIsFirma(boolean isFirma) {
-		this.isFirma = isFirma;
-	}
-
-	public boolean getRechnungsartIsFirma() {
-		return isFirma;
 	}
 
 	@Override

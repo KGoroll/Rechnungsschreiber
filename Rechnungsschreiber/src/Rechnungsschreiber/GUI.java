@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.JRadioButton;
@@ -67,7 +66,7 @@ public class GUI extends JFrame {
     private JTextField txtNeuerKundeOrt;
     private JComboBox<Entry<String,String>> comboBox;
     private JRadioButton rdbtnNeuerKundeFirma;
-    private JComboBox<Entry<String, String>> comboBox_1;
+    private JComboBox<Entry<String, String>> comboBox_b;
     
     public GUI(WordDocument dokument) {
     	initialize(dokument);
@@ -89,7 +88,7 @@ public class GUI extends JFrame {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		//dbVerbindung.insertNewKunde(neueVorlage,TemplatePath);
+		dbVerbindung.insertNewKunde(neueVorlage);
     }
     
     public void populateBearbeitenFeld(){
@@ -101,19 +100,21 @@ public class GUI extends JFrame {
     	  txtBeschreibung_b.setText(doc.getRechnungsDaten().getBeschreibung());
     	  txtBetrag_b.setText(doc.getRechnungsDaten().getBetrag());
     	  
-    	  comboBox_1.removeAllItems();
-    	  addItems(comboBox_1);
+    	  comboBox_b.removeAllItems();
+    	  addItems(comboBox_b);
     }
     
-    public void bearbeiten(WordDocument dokument) {
+    @SuppressWarnings("unchecked")
+	public void bearbeiten(WordDocument dokument) {
     	dokument.getRechnungsDaten().setRechnungsNr(txtRechnungsnummer_b.getText());
     	dokument.getRechnungsDaten().setDatum(txtRechnungsdatum_b.getText());
 		dokument.getRechnungsDaten().setWoche(txtKW_b.getText());
 		dokument.getRechnungsDaten().setBauvorhaben(txtBauvorhaben_b.getText());
 		dokument.getRechnungsDaten().setBetrag(txtBetrag_b.getText());
 		dokument.getRechnungsDaten().setBeschreibung(txtBeschreibung_b.getText());
-		
-    	String[] paths = dbVerbindung.getFilePaths(Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr()));
+		dokument.getRechnungsDaten().setKundennummer(((Entry<String,String>) comboBox_b.getSelectedItem()).getValue());
+    	
+		String[] paths = dbVerbindung.getFilePaths(Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr()));
     	
     	File pdfFile = new File(paths[0]);
     	File wordFile = new File(paths[1]);
@@ -158,7 +159,7 @@ public class GUI extends JFrame {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} 
-			dbVerbindung.insertNeueRechnung(dokument,convert);	
+			//dbVerbindung.insertNeueRechnung(dokument,convert);	
 	}
     
     public void addItems(JComboBox<Entry<String,String>> comboBox) {
@@ -181,8 +182,6 @@ public class GUI extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
-		ButtonGroup RechnungsArt_b = new ButtonGroup();
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(0, 0, 792, 623);
@@ -424,27 +423,6 @@ public class GUI extends JFrame {
 		txtRechnungsnummer_b.setBounds(10, 28, 110, 20);
 		bearbeiten.add(txtRechnungsnummer_b);
 		
-		JRadioButton rdbtnFirma_b = new JRadioButton("Firma");
-		rdbtnFirma_b.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dokument.getRechnungsDaten().setRechnungsartIsFirma(true);
-			}
-		});
-		rdbtnFirma_b.setBounds(139, 27, 79, 23);
-		bearbeiten.add(rdbtnFirma_b);
-		RechnungsArt_b.add(rdbtnFirma_b);
-		
-		JRadioButton rdbtnPrivat_b = new JRadioButton("Privat");
-		rdbtnPrivat_b.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dokument.getRechnungsDaten().setRechnungsartIsFirma(false);
-			}
-		});
-		rdbtnPrivat_b.setSelected(true);
-		rdbtnPrivat_b.setBounds(220, 27, 79, 23);
-		bearbeiten.add(rdbtnPrivat_b);
-		RechnungsArt_b.add(rdbtnPrivat_b);
-		
 		JLabel lblRechnungsdatum_b = new JLabel("Rechnungsdatum");
 		lblRechnungsdatum_b.setBounds(10, 64, 135, 14);
 		bearbeiten.add(lblRechnungsdatum_b);
@@ -499,9 +477,13 @@ public class GUI extends JFrame {
 		btnBearbeiten.setBounds(10, 358, 89, 23);
 		bearbeiten.add(btnBearbeiten);
 		
-		comboBox_1 = new JComboBox();
-		comboBox_1.setBounds(139, 77, 310, 21);
-		bearbeiten.add(comboBox_1);
+		comboBox_b = new JComboBox();
+		comboBox_b.setBounds(130, 28, 310, 21);
+		bearbeiten.add(comboBox_b);
+		
+		JLabel lblKunde_b = new JLabel("Kunde");
+		lblKunde_b.setBounds(130, 11, 74, 14);
+		bearbeiten.add(lblKunde_b);
 		
 		JPanel neuerKunde = new JPanel();
 		tabbedPane.addTab("Neuer Kunde", null, neuerKunde, null);
