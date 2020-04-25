@@ -216,6 +216,7 @@ public class GUI extends JFrame {
 		btnFertig.setBounds(10, 360, 89, 23);
 		NeueRechnung.add(btnFertig);
 		
+		
 		lblBetrag = new JLabel("Betrag Netto");
 		lblBetrag.setBounds(10, 305, 110, 14);
 		NeueRechnung.add(lblBetrag);
