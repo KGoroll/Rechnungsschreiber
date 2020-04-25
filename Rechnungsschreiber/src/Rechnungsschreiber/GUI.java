@@ -4,12 +4,16 @@ import net.proteanit.sql.DbUtils;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import org.apache.log4j.BasicConfigurator;
+
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
@@ -46,6 +50,7 @@ public class GUI extends JFrame {
     private Convert convert;
     private String strDate = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
     private DatenbankVerbindung dbVerbindung;
+    private WordDocument dokument;
     private JPanel contentPane;
     private JPanel bearbeiten;
     private JLabel lblRechnungsnummer_b;
@@ -69,10 +74,29 @@ public class GUI extends JFrame {
     private JComboBox<Entry<String, String>> comboBox_b;
     
     public GUI(WordDocument dokument) {
+    	this.dokument = dokument;
     	initialize(dokument);
     }
+ 
+    public static void main(String[] args) throws Exception {
+		BasicConfigurator.configure();
+		RechnungsInfo daten = new RechnungsInfo();
+		WordDocument dokument = new WordDocument(daten);
+		
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					GUI frame = new GUI(dokument);
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}); 
+		
+	}
     
-    private void addNewTemplate(WordDocument dokument) {
+    private void addNewTemplate() {
     	TemplateInfo neueVorlage = new TemplateInfo();
 		
 		neueVorlage.setKundennummer(txtNeueKundennummer.getText());
@@ -105,7 +129,7 @@ public class GUI extends JFrame {
     }
     
     @SuppressWarnings("unchecked")
-	public void bearbeiten(WordDocument dokument) {
+	public void bearbeiten() {
     	dokument.getRechnungsDaten().setRechnungsNr(txtRechnungsnummer_b.getText());
     	dokument.getRechnungsDaten().setDatum(txtRechnungsdatum_b.getText());
 		dokument.getRechnungsDaten().setWoche(txtKW_b.getText());
@@ -142,7 +166,7 @@ public class GUI extends JFrame {
     }
     
     @SuppressWarnings("unchecked")
-	public void fertigstellen(WordDocument dokument) {
+	public void fertigstellen() {
     	
 		dokument.getRechnungsDaten().setRechnungsNr(txtRechnungsnummer.getText());
 		dokument.getRechnungsDaten().setDatum(txtRechnungsDatum.getText());
@@ -282,7 +306,7 @@ public class GUI extends JFrame {
 		btnFertig.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				progressBar.setValue(0);
-				fertigstellen(dokument);
+				fertigstellen();
 				progressBar.setValue(100);
 			}
 		});
@@ -472,7 +496,7 @@ public class GUI extends JFrame {
 		JButton btnBearbeiten = new JButton("Bearbeiten");
 		btnBearbeiten.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				bearbeiten(dokument);
+				bearbeiten();
 			}
 		});
 		btnBearbeiten.setBounds(10, 358, 89, 23);
@@ -542,7 +566,7 @@ public class GUI extends JFrame {
 		JButton btnNeu = new JButton("Neu");
 		btnNeu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addNewTemplate(dokument);
+				addNewTemplate();
 			}
 		});
 		btnNeu.setBounds(36, 373, 89, 23);
