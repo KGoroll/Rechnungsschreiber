@@ -47,10 +47,8 @@ public class GUI extends JFrame {
 	private JLabel lblBetrag;
 	private JTextField txtBetrag;
 	private JProgressBar progressBar;
-    private Convert convert;
     private String strDate = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
     private DatenbankVerbindung dbVerbindung;
-    private WordDocument dokument;
     private JPanel contentPane;
     private JPanel bearbeiten;
     private JLabel lblRechnungsnummer_b;
@@ -73,20 +71,16 @@ public class GUI extends JFrame {
     private JRadioButton rdbtnNeuerKundeFirma;
     private JComboBox<Entry<String, String>> comboBox_b;
     
-    public GUI(WordDocument dokument) {
-    	this.dokument = dokument;
-    	initialize(dokument);
+    public GUI() {
+    	initialize();
     }
  
     public static void main(String[] args) throws Exception {
 		BasicConfigurator.configure();
-		RechnungsInfo daten = new RechnungsInfo();
-		WordDocument dokument = new WordDocument(daten);
-		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					GUI frame = new GUI(dokument);
+					GUI frame = new GUI();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -97,6 +91,7 @@ public class GUI extends JFrame {
 	}
     
     private void addNewTemplate() {
+    	WordDocument dokument = new WordDocument(new RechnungsInfo());
     	TemplateInfo neueVorlage = new TemplateInfo();
 		
 		neueVorlage.setKundennummer(txtNeueKundennummer.getText());
@@ -116,7 +111,7 @@ public class GUI extends JFrame {
     }
     
     public void populateBearbeitenFeld(){
-    	WordDocument doc = dbVerbindung.getRechnungsDaten(Integer.parseInt(txtRechnungsnummer_b.getText()));
+    	  WordDocument doc = dbVerbindung.getRechnungsDaten(Integer.parseInt(txtRechnungsnummer_b.getText()));
     	  txtRechnungsnummer_b.setText(doc.getRechnungsDaten().getRechnungsNr());
     	  txtRechnungsdatum_b.setText(doc.getRechnungsDaten().getDatum());
     	  txtKW_b.setText(doc.getRechnungsDaten().getWoche());
@@ -130,6 +125,8 @@ public class GUI extends JFrame {
     
     @SuppressWarnings("unchecked")
 	public void bearbeiten() {
+    	WordDocument dokument = new WordDocument(new RechnungsInfo());
+    	
     	dokument.getRechnungsDaten().setRechnungsNr(txtRechnungsnummer_b.getText());
     	dokument.getRechnungsDaten().setDatum(txtRechnungsdatum_b.getText());
 		dokument.getRechnungsDaten().setWoche(txtKW_b.getText());
@@ -157,16 +154,17 @@ public class GUI extends JFrame {
     	
     	try {
 			dokument.generateDocxFileFromTemplate();
+			Convert convert = new Convert(dokument);
+			dbVerbindung.insertNeueRechnung(dokument, convert);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	convert = new Convert(dokument);
-    	dbVerbindung.insertNeueRechnung(dokument, convert);
     }
     
     @SuppressWarnings("unchecked")
 	public void fertigstellen() {
+    	WordDocument dokument = new WordDocument(new RechnungsInfo());
     	
 		dokument.getRechnungsDaten().setRechnungsNr(txtRechnungsnummer.getText());
 		dokument.getRechnungsDaten().setDatum(txtRechnungsDatum.getText());
@@ -177,13 +175,14 @@ public class GUI extends JFrame {
 		dokument.getRechnungsDaten().setKundennummer(((Entry<String,String>) comboBox.getSelectedItem()).getValue());
 		
 		try {
+			
 			dokument.generateDocxFileFromTemplate();
-			convert = new Convert(dokument);
+			Convert convert = new Convert(dokument);
+			dbVerbindung.insertNeueRechnung(dokument,convert);	
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} 
-			//dbVerbindung.insertNeueRechnung(dokument,convert);	
 	}
     
     public void addItems(JComboBox<Entry<String,String>> comboBox) {
@@ -194,7 +193,7 @@ public class GUI extends JFrame {
     }
     
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void initialize(WordDocument dokument) {
+	public void initialize() {
 		dbVerbindung = new DatenbankVerbindung();
 		
 		setForeground(new Color(0, 0, 0));

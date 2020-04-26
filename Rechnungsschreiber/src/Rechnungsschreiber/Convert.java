@@ -1,7 +1,5 @@
 package Rechnungsschreiber;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class Convert{
 	  
@@ -10,7 +8,6 @@ public class Convert{
 	  private  String pathToOutput;
 	  private  WordDocument dokument;
 	  private  Process process;
-	  private  byte[] fileContent;
 	  
 	  public Convert(WordDocument dokument) {
 		  this.dokument = dokument;
@@ -36,9 +33,6 @@ public class Convert{
 		}
 	    
 	    System.out.println("Result of Office processing: " + process.exitValue());
-
-	    File file = new File(pathToOutput);
-		
 	  }
 	  
 	  public String getPathToPdf() {
