@@ -4,11 +4,14 @@ import net.proteanit.sql.DbUtils;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.BasicConfigurator;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
 
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 
@@ -18,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,8 +38,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
 
 
-@SuppressWarnings("serial")
 public class GUI extends JFrame {
+	private static final long serialVersionUID = -2107945385669135691L;
 	private JTextField txtRechnungsnummer;
 	private JTextField txtBauvorhaben;
 	private JLabel lblRechnungsdatum;
@@ -70,6 +74,7 @@ public class GUI extends JFrame {
     private JComboBox<Entry<String,String>> comboBox;
     private JRadioButton rdbtnNeuerKundeFirma;
     private JComboBox<Entry<String, String>> comboBox_b;
+    private JPanel NeueRechnung;
     
     public GUI() {
     	initialize();
@@ -173,16 +178,16 @@ public class GUI extends JFrame {
 		dokument.getRechnungsDaten().setBetrag(txtBetrag.getText());
 		dokument.getRechnungsDaten().setBeschreibung(txtBeschreibung.getText());
 		dokument.getRechnungsDaten().setKundennummer(((Entry<String,String>) comboBox.getSelectedItem()).getValue());
-		
 		try {
-			
 			dokument.generateDocxFileFromTemplate();
-			Convert convert = new Convert(dokument);
-			dbVerbindung.insertNeueRechnung(dokument,convert);	
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		} 
+		catch (Docx4JException e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());} 
+		catch (FileNotFoundException e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler. Template nicht vorhanden \n" + e.toString());}
+		catch (Exception e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim fertigstellen. In diesem Fall in den Code schauen \n" + e.toString());}
+		
+		/*Convert convert = new Convert(dokument);
+		dbVerbindung.insertNeueRechnung(dokument,convert);	*/
+		
 	}
     
     public void addItems(JComboBox<Entry<String,String>> comboBox) {
@@ -190,6 +195,10 @@ public class GUI extends JFrame {
     	for(Entry<String,String> m : KundenNameNummer.entrySet()) {
     		comboBox.addItem(m);
     	}
+    }
+    
+    public JPanel getPanel() {
+    	return NeueRechnung;
     }
     
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -210,7 +219,7 @@ public class GUI extends JFrame {
 		tabbedPane.setBounds(0, 0, 792, 623);
 		contentPane.add(tabbedPane);
 		
-		JPanel NeueRechnung = new JPanel();
+		NeueRechnung = new JPanel();
 		NeueRechnung.setBorder(null);
 		NeueRechnung.setBackground(new Color(204,204,204));
 		tabbedPane.addTab("Neue Rechnung", null, NeueRechnung, null);

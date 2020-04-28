@@ -1,10 +1,15 @@
 package Rechnungsschreiber;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
+
+import javax.xml.bind.JAXBException;
+
 import org.docx4j.Docx4J;
 import org.docx4j.model.datastorage.migration.VariablePrepare;
 
@@ -21,7 +26,7 @@ public class WordDocument {
 		this.daten = daten;
 	}
 	
-    public void generateDocxFileFromTemplate() throws Exception {
+    public void generateDocxFileFromTemplate() throws FileNotFoundException, Docx4JException, Exception  {
     	
     	TEMPLATE = "D:\\Benutzer\\Desktop\\Rechnungen\\Vorlagen\\Vorlage " + daten.getKundennummer() + ".docx";
     	
@@ -32,8 +37,8 @@ public class WordDocument {
 
         MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
 
-        VariablePrepare.prepare(wordMLPackage);
-
+		VariablePrepare.prepare(wordMLPackage);
+		
         HashMap<String, String> variables = new HashMap<>();
         variables.put("rechnungsNr", daten.getRechnungsNr());
         variables.put("datum", daten.getDatum());

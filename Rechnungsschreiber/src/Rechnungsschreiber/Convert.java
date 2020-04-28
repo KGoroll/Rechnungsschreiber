@@ -9,28 +9,19 @@ public class Convert{
 	  private  WordDocument dokument;
 	  private  Process process;
 	  
-	  public Convert(WordDocument dokument) {
+	  public Convert(WordDocument dokument) throws IOException, InterruptedException {
 		  this.dokument = dokument;
 		  runConvert();
 	  }	  
 	  
-	  public void runConvert() {
+	  public void runConvert() throws IOException, InterruptedException {
 		System.out.println("Started Converting");
 		pathToTemplate = dokument.getDocxAbsoulteFilePath();
 		pathToOutput = dokument.getFileDirectory() + "\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".pdf";		
 
-	    try {
-			process = new ProcessBuilder(pathToExe, pathToTemplate, pathToOutput).start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    try {
-			process.waitFor();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
+		process = new ProcessBuilder(pathToExe, pathToTemplate, pathToOutput).start();
+		process.waitFor();
 	    
 	    System.out.println("Result of Office processing: " + process.exitValue());
 	  }
