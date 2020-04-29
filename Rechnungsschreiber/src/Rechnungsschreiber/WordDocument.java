@@ -8,8 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 
-import javax.xml.bind.JAXBException;
-
 import org.docx4j.Docx4J;
 import org.docx4j.model.datastorage.migration.VariablePrepare;
 

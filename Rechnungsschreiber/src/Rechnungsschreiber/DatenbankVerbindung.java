@@ -44,7 +44,7 @@ public class DatenbankVerbindung {
 		}
 	}
 	
-	public void insertNeueRechnung(WordDocument dokument, Convert convert) {
+	public void insertNeueRechnung(WordDocument dokument, Convert convert) throws SQLException {
 	Statement stmt = null;
 	int RechNr = Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr());
 	String LeistungsZeitr = dokument.getRechnungsDaten().getWoche();
@@ -57,16 +57,12 @@ public class DatenbankVerbindung {
 	String Beschreibung = dokument.getRechnungsDaten().getBeschreibung();
 
 	String insertQuery = "insert into Rechnung values("+RechNr+",'"+LeistungsZeitr+"','"+RechDatum+"','"+Kundennummer+"','"+Bauvorhaben+"',"+Betrag+",'"+PdfDatei+"','"+WordDatei+"','"+Beschreibung+"')";	
-		try {
 			stmt = conn.createStatement();
 			int m = stmt.executeUpdate(insertQuery);	
 			if(m == 1)
 				System.out.println("inserted Row to Rechnung:" + insertQuery);
 			else
 				System.out.println("insertion failed");
-		} catch (SQLException e) {
-			System.err.println(e);
-		}
 	}
 	
 	public String[] getFilePaths(int nummer) {

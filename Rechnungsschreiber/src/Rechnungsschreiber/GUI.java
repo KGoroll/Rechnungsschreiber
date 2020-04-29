@@ -4,8 +4,6 @@ import net.proteanit.sql.DbUtils;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.xml.bind.JAXBException;
-
 import org.apache.log4j.BasicConfigurator;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 
@@ -23,6 +21,7 @@ import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -170,6 +169,7 @@ public class GUI extends JFrame {
     @SuppressWarnings("unchecked")
 	public void fertigstellen() {
     	WordDocument dokument = new WordDocument(new RechnungsInfo());
+    	Convert convert = null;
     	
 		dokument.getRechnungsDaten().setRechnungsNr(txtRechnungsnummer.getText());
 		dokument.getRechnungsDaten().setDatum(txtRechnungsDatum.getText());
@@ -180,15 +180,24 @@ public class GUI extends JFrame {
 		dokument.getRechnungsDaten().setKundennummer(((Entry<String,String>) comboBox.getSelectedItem()).getValue());
 		try {
 			dokument.generateDocxFileFromTemplate();
+			convert = new Convert(dokument);
+			dbVerbindung.insertNeueRechnung(dokument,convert);	
 		} 
 		catch (Docx4JException e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());} 
 		catch (FileNotFoundException e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler. Template nicht vorhanden \n" + e.toString());}
+		catch (IOException | InterruptedException e) {
+			 if(new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".docx").delete())
+				 JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim konvertieren. Word Datei wurde wieder gelöscht \n" + e.toString());
+			 else
+				 JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim konvertieren. Word Datei konnte nicht gelöscht werden \n" + e.toString());
+		}
+		catch (SQLException e) {
+			new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".docx").delete();
+			new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".pdf").delete();
+			JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim einsetzen in die Datenbank. Dateien wurden wieder gelöscht. Eingabe überprüfen \n" + e.toString());
+		}
 		catch (Exception e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim fertigstellen. In diesem Fall in den Code schauen \n" + e.toString());}
-		
-		/*Convert convert = new Convert(dokument);
-		dbVerbindung.insertNeueRechnung(dokument,convert);	*/
-		
-	}
+   }
     
     public void addItems(JComboBox<Entry<String,String>> comboBox) {
     	HashMap<String,String> KundenNameNummer = dbVerbindung.retrieveKundennameUndNummer();
