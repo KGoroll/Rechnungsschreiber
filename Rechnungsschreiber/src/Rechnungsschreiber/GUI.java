@@ -74,6 +74,7 @@ public class GUI extends JFrame {
     private JRadioButton rdbtnNeuerKundeFirma;
     private JComboBox<Entry<String, String>> comboBox_b;
     private JPanel NeueRechnung;
+    private JPanel neuerKunde;
     
     public GUI() {
     	initialize();
@@ -107,11 +108,10 @@ public class GUI extends JFrame {
 		
 		try {
 			dokument.generateNewTemplate(neueVorlage);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			dbVerbindung.insertNewKunde(neueVorlage);
+		} catch (Docx4JException e) {JOptionPane.showMessageDialog(neuerKunde, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());
+		} catch (Exception e) {JOptionPane.showMessageDialog(neuerKunde, "Fehler beim erstellen der Vorlage in dem Fall Eingabe überprüfen \n oder in den code schauen \n" + e.toString());
 		}
-		dbVerbindung.insertNewKunde(neueVorlage);
     }
     
     public void populateBearbeitenFeld(){
@@ -139,7 +139,10 @@ public class GUI extends JFrame {
 		dokument.getRechnungsDaten().setBeschreibung(txtBeschreibung_b.getText());
 		dokument.getRechnungsDaten().setKundennummer(((Entry<String,String>) comboBox_b.getSelectedItem()).getValue());
     	
-		String[] paths = dbVerbindung.getFilePaths(Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr()));
+		String[] paths = null;
+		try {
+			paths = dbVerbindung.getFilePaths(Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr()));
+		} catch (NumberFormatException | SQLException e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim erhalten der Pfade zum bearbeiten. Rechnungsnummer überprüfen oder Datenbank \n" + e.toString());}
     	
     	File pdfFile = new File(paths[0]);
     	File wordFile = new File(paths[1]);
@@ -156,20 +159,13 @@ public class GUI extends JFrame {
     	
     	dbVerbindung.Rechnunglöschen(Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr()));
     	
-    	try {
-			dokument.generateDocxFileFromTemplate();
-			Convert convert = new Convert(dokument);
-			dbVerbindung.insertNeueRechnung(dokument, convert);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	erstelleNeueRechnung(dokument);
     }
     
     @SuppressWarnings("unchecked")
 	public void fertigstellen() {
     	WordDocument dokument = new WordDocument(new RechnungsInfo());
-    	Convert convert = null;
+    	
     	
 		dokument.getRechnungsDaten().setRechnungsNr(txtRechnungsnummer.getText());
 		dokument.getRechnungsDaten().setDatum(txtRechnungsDatum.getText());
@@ -178,7 +174,13 @@ public class GUI extends JFrame {
 		dokument.getRechnungsDaten().setBetrag(txtBetrag.getText());
 		dokument.getRechnungsDaten().setBeschreibung(txtBeschreibung.getText());
 		dokument.getRechnungsDaten().setKundennummer(((Entry<String,String>) comboBox.getSelectedItem()).getValue());
-		try {
+		
+		erstelleNeueRechnung(dokument);
+   }
+    
+    public void erstelleNeueRechnung(WordDocument dokument) {
+    	Convert convert = null;
+    	try {
 			dokument.generateDocxFileFromTemplate();
 			convert = new Convert(dokument);
 			dbVerbindung.insertNeueRechnung(dokument,convert);	
@@ -191,23 +193,19 @@ public class GUI extends JFrame {
 			 else
 				 JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim konvertieren. Word Datei konnte nicht gelöscht werden \n" + e.toString());
 		}
-		catch (SQLException e) {
+		catch (NumberFormatException | SQLException e) {
 			new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".docx").delete();
 			new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".pdf").delete();
 			JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim einsetzen in die Datenbank. Dateien wurden wieder gelöscht. Eingabe überprüfen \n" + e.toString());
 		}
 		catch (Exception e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim fertigstellen. In diesem Fall in den Code schauen \n" + e.toString());}
-   }
+    }
     
     public void addItems(JComboBox<Entry<String,String>> comboBox) {
     	HashMap<String,String> KundenNameNummer = dbVerbindung.retrieveKundennameUndNummer();
     	for(Entry<String,String> m : KundenNameNummer.entrySet()) {
     		comboBox.addItem(m);
     	}
-    }
-    
-    public JPanel getPanel() {
-    	return NeueRechnung;
     }
     
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -331,10 +329,9 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					dbVerbindung.druckeRechnung(Integer.parseInt(txtRechnungsnummer.getText()));
-				} catch (IOException | PrinterException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				} catch (NumberFormatException e1) {JOptionPane.showMessageDialog(NeueRechnung, "Rechnungsnummer überprüfen \n");
+				} catch (IOException e1) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim Laden der PDF Datei. Pfad überprüfen \n" + e.toString());
+				} catch (PrinterException e1) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim Drucken. Drucker oder so überprüfen \n" + e.toString());}
 			}
 		});
 		btnffnen.addActionListener(new ActionListener() {
@@ -527,7 +524,7 @@ public class GUI extends JFrame {
 		lblKunde_b.setBounds(130, 11, 74, 14);
 		bearbeiten.add(lblKunde_b);
 		
-		JPanel neuerKunde = new JPanel();
+		neuerKunde = new JPanel();
 		tabbedPane.addTab("Neuer Kunde", null, neuerKunde, null);
 		neuerKunde.setLayout(null);
 		

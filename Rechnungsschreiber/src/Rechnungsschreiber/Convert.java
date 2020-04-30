@@ -19,7 +19,6 @@ public class Convert{
 		pathToTemplate = dokument.getDocxAbsoulteFilePath();
 		pathToOutput = dokument.getFileDirectory() + "\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".pdf";		
 
-	
 		process = new ProcessBuilder(pathToExe, pathToTemplate, pathToOutput).start();
 		process.waitFor();
 	    

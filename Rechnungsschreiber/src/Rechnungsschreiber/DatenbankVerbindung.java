@@ -44,7 +44,7 @@ public class DatenbankVerbindung {
 		}
 	}
 	
-	public void insertNeueRechnung(WordDocument dokument, Convert convert) throws SQLException {
+	public void insertNeueRechnung(WordDocument dokument, Convert convert) throws SQLException, NumberFormatException {
 	Statement stmt = null;
 	int RechNr = Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr());
 	String LeistungsZeitr = dokument.getRechnungsDaten().getWoche();
@@ -65,20 +65,15 @@ public class DatenbankVerbindung {
 				System.out.println("insertion failed");
 	}
 	
-	public String[] getFilePaths(int nummer) {
+	public String[] getFilePaths(int nummer) throws SQLException {
 		Statement stmt = null;
 		String query = "select pdfdatei,worddatei from rechnung where rechnungsnr = " + nummer;
 		String[] paths = new String[2];
-		try {
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			rs.next();
 			paths[0] = rs.getString(1);
 			paths[1] = rs.getString(2);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return paths;
 	}
 	

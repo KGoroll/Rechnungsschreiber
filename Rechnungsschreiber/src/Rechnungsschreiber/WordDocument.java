@@ -58,7 +58,7 @@ public class WordDocument {
         System.out.println("finished creating Word document");
     }
     
-    public void generateNewTemplate(TemplateInfo neueVorlage) throws Exception {
+    public void generateNewTemplate(TemplateInfo neueVorlage) throws Docx4JException, Exception {
     	InputStream templateInputStream;
     	if (neueVorlage.getIsFirma() == true) {
     		templateInputStream = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE_FIRMA);
