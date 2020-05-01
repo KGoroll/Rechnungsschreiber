@@ -17,7 +17,6 @@ import java.util.HashMap;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -31,17 +30,11 @@ public class DatenbankVerbindung {
 	private String url = "jdbc:oracle:thin:@localhost:1521:orcl";
 	
 	
-	DatenbankVerbindung() {	
-		try
-		{ 
+	DatenbankVerbindung() throws SQLException {	
+		 
 			DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
 			conn = DriverManager.getConnection(url, user, pass);
 			System.out.println("Connected!");
-		} 
-		catch(Exception ex) 
-		{ 
-			System.err.println(ex); 
-		}
 	}
 	
 	public void insertNeueRechnung(WordDocument dokument, Convert convert) throws SQLException, NumberFormatException {
@@ -77,50 +70,41 @@ public class DatenbankVerbindung {
 		return paths;
 	}
 	
-	public WordDocument getRechnungsDaten(int nummer) {
+	public WordDocument getRechnungsDaten(int nummer) throws SQLException {
 		RechnungsInfo daten = new RechnungsInfo();
 		Statement stmt = null;
 		String query = "select * from rechnung where rechnungsnr = " + nummer;
 		
-		try {
-			stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(query);
-			rs.next();
-			daten.setRechnungsNr(String.valueOf(rs.getInt(1)));
-			daten.setWoche(rs.getString(2));
-			LocalDateTime sqldatum = LocalDateTime.parse(rs.getString(3), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-			String datum = sqldatum.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-			daten.setDatum(datum);
-			daten.setBauvorhaben(rs.getString(5));
-			daten.setBetrag(String.valueOf(rs.getFloat(6)).replace(".", ","));
-			daten.setBeschreibung(rs.getString(9));
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery(query);
+		rs.next();
+		daten.setRechnungsNr(String.valueOf(rs.getInt(1)));
+		daten.setWoche(rs.getString(2));
+		LocalDateTime sqldatum = LocalDateTime.parse(rs.getString(3), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String datum = sqldatum.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+		daten.setDatum(datum);
+		daten.setBauvorhaben(rs.getString(5));
+		daten.setBetrag(String.valueOf(rs.getFloat(6)).replace(".", ","));
+		daten.setBeschreibung(rs.getString(9));
+				
 		WordDocument doc = new WordDocument(daten);
 		return doc;
 	}
 	
-	public String retrieveMaxRechnungsnummer() {
+	public String retrieveNextRechnungsnummer() throws SQLException {
 		Statement stmt = null;
 		String query = "select max(rechnungsnr) from Rechnung";
-		try {
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			rs.next();
 			int RechNummer = rs.getInt(1);
 			return String.valueOf(RechNummer+1);
-		} catch (SQLException e) {
-			throw new Error("Problem", e);
-		}
 	}
 	
-	public void öffneRechnung(int nummer) {
+	public void öffneRechnung(int nummer) throws SQLException, IOException {
 		Statement stmt = null;
 		String query ="select pdfdatei from rechnung where rechnungsnr = " + nummer;
-		try {
+		
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			rs.next();
@@ -129,17 +113,10 @@ public class DatenbankVerbindung {
 			File PdfFile = new File(pathToPdf);
 			Desktop desktop = Desktop.getDesktop();
 			desktop.open(PdfFile);
-		} catch (SQLException e) {
-			throw new Error("Problem", e);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		
 	}
 
-	public void druckeRechnung(int nummer) throws IOException, PrinterException {
+	public void druckeRechnung(int nummer) throws IOException, PrinterException, SQLException {
 		Statement stmt = null;
 		String query ="select pdfdatei from rechnung where rechnungsnr = " + nummer;
 		
@@ -147,7 +124,6 @@ public class DatenbankVerbindung {
 		System.out.println("Default Printer: " + defaultPrinter);
 		PrintService service = PrintServiceLookup.lookupDefaultPrintService();
 		
-		try {
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			rs.next();
@@ -159,32 +135,22 @@ public class DatenbankVerbindung {
 			job.setPrintService(service);
 			job.print();
 			document.close();
-			
-		} catch (SQLException e) {
-			throw new Error("Problem", e);
-		}
 	}
 
-	public void Rechnunglöschen(int nummer) {
+	public void Rechnunglöschen(int nummer) throws SQLException {
 		Statement stmt = null;
 		String query = "delete from rechnung where rechnungsnr = " + nummer;
 		
-		try {
 			stmt = conn.createStatement();
 			int m = stmt.executeUpdate(query);
 			if (m == 1)
 				System.out.println("Rechnung nummer " + nummer + " gelöscht");
 			else 
 				System.out.println("Rechnung nummer " + nummer + " konnte nicht gelöscht werden");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
-	public ResultSet search(String sucheNach, JPanel panel) {
+	public ResultSet search(String sucheNach) throws SQLException {
 		PreparedStatement statement;
-	        try {
 	        	if (sucheNach.isEmpty()) {
 	            	String query = "select rechnungsnr,leistungszeitraum as KW,rechdatum,kundennr,bauvorhaben,betrag,beschreibung from rechnung order by rechnungsnr";
 	            	Statement stmt = conn.createStatement();
@@ -200,15 +166,6 @@ public class DatenbankVerbindung {
 	            statement.setString(4, "%" + sucheNach + "%");
 	            
 	            return statement.executeQuery();	
-	        } catch (SQLException e) {
-	            if (conn == null) {
-	                JOptionPane.showMessageDialog(panel, "Connection to database failed.");
-	            } else {
-	                JOptionPane.showMessageDialog(panel, "No results found for " + sucheNach + " in the database.");
-	            }
-	            e.printStackTrace();
-	        }
-		return null;
 	}
 
 	public HashMap<String,String> getMonatZuKalenderWocheVon(){
@@ -251,7 +208,7 @@ public class DatenbankVerbindung {
 		return nummer;
 	}
 	
-	public float getUmsatz(String monatV, int jahrV, String monatB, int jahrB) {
+	public float getUmsatz(String monatV, int jahrV, String monatB, int jahrB) throws SQLException {
 		HashMap<String,String> monatZuKalenderWocheVon = getMonatZuKalenderWocheVon();
 		HashMap<String,String> monatZuKalenderWocheBis = getMonatZuKalenderWocheBis();
 		
@@ -279,18 +236,11 @@ public class DatenbankVerbindung {
 		query.append(") and ( rechnungsnr >= ").append(jahrV).append(" and rechnungsnr < ").append(jahrB).append(")");
 		
 		Statement stmt = null;
-		try {
-			stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(query.toString());
-			rs.next();
-			float umsatz = rs.getFloat(1);
-			return umsatz;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return 0;
+		stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery(query.toString());
+		rs.next();
+		float umsatz = rs.getFloat(1);
+		return umsatz;
 	}
 
 	public ResultSet searchByQuery(String query, JPanel suchen) {

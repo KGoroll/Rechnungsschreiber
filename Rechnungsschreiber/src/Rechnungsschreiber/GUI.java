@@ -73,8 +73,9 @@ public class GUI extends JFrame {
     private JComboBox<Entry<String,String>> comboBox;
     private JRadioButton rdbtnNeuerKundeFirma;
     private JComboBox<Entry<String, String>> comboBox_b;
-    private JPanel NeueRechnung;
+    private JPanel neueRechnung;
     private JPanel neuerKunde;
+    private JPanel suchen;
     
     public GUI() {
     	initialize();
@@ -115,7 +116,12 @@ public class GUI extends JFrame {
     }
     
     public void populateBearbeitenFeld(){
-    	  WordDocument doc = dbVerbindung.getRechnungsDaten(Integer.parseInt(txtRechnungsnummer_b.getText()));
+    	  WordDocument doc = null;
+		try {
+			doc = dbVerbindung.getRechnungsDaten(Integer.parseInt(txtRechnungsnummer_b.getText()));
+		} catch (NumberFormatException e) {JOptionPane.showMessageDialog(bearbeiten, "Eingabe überprüfen \n" + e.toString());
+		} catch (SQLException e) {JOptionPane.showMessageDialog(bearbeiten, "Fehler beim erfragen der Daten aus der Datenbank \n Datenbank überprüfen \n" + e.toString());
+		}
     	  txtRechnungsnummer_b.setText(doc.getRechnungsDaten().getRechnungsNr());
     	  txtRechnungsdatum_b.setText(doc.getRechnungsDaten().getDatum());
     	  txtKW_b.setText(doc.getRechnungsDaten().getWoche());
@@ -142,7 +148,7 @@ public class GUI extends JFrame {
 		String[] paths = null;
 		try {
 			paths = dbVerbindung.getFilePaths(Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr()));
-		} catch (NumberFormatException | SQLException e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim erhalten der Pfade zum bearbeiten. Rechnungsnummer überprüfen oder Datenbank \n" + e.toString());}
+		} catch (NumberFormatException | SQLException e) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim erhalten der Pfade zum bearbeiten. Rechnungsnummer überprüfen oder Datenbank \n" + e.toString());}
     	
     	File pdfFile = new File(paths[0]);
     	File wordFile = new File(paths[1]);
@@ -157,9 +163,13 @@ public class GUI extends JFrame {
     	else 
     		System.out.println("Word File konnte nicht gelöscht werden");
     	
-    	dbVerbindung.Rechnunglöschen(Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr()));
+    	try {
+			dbVerbindung.Rechnunglöschen(Integer.parseInt(dokument.getRechnungsDaten().getRechnungsNr()));
+			erstelleNeueRechnung(dokument);
+    	} catch (SQLException e) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim löschen der alten Rechnung \n Rechnung konnte nicht aus der Datenbank entfernt werden \n" + e.toString());
+		}
     	
-    	erstelleNeueRechnung(dokument);
+    	
     }
     
     @SuppressWarnings("unchecked")
@@ -185,20 +195,20 @@ public class GUI extends JFrame {
 			convert = new Convert(dokument);
 			dbVerbindung.insertNeueRechnung(dokument,convert);	
 		} 
-		catch (Docx4JException e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());} 
-		catch (FileNotFoundException e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler. Template nicht vorhanden \n" + e.toString());}
+		catch (Docx4JException e) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());} 
+		catch (FileNotFoundException e) {JOptionPane.showMessageDialog(neueRechnung, "Fehler. Template nicht vorhanden \n" + e.toString());}
 		catch (IOException | InterruptedException e) {
 			 if(new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".docx").delete())
-				 JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim konvertieren. Word Datei wurde wieder gelöscht \n" + e.toString());
+				 JOptionPane.showMessageDialog(neueRechnung, "Fehler beim konvertieren. Word Datei wurde wieder gelöscht \n" + e.toString());
 			 else
-				 JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim konvertieren. Word Datei konnte nicht gelöscht werden \n" + e.toString());
+				 JOptionPane.showMessageDialog(neueRechnung, "Fehler beim konvertieren. Word Datei konnte nicht gelöscht werden \n" + e.toString());
 		}
 		catch (NumberFormatException | SQLException e) {
 			new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".docx").delete();
 			new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".pdf").delete();
-			JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim einsetzen in die Datenbank. Dateien wurden wieder gelöscht. Eingabe überprüfen \n" + e.toString());
+			JOptionPane.showMessageDialog(neueRechnung, "Fehler beim einsetzen in die Datenbank. Dateien wurden wieder gelöscht. Eingabe überprüfen \n" + e.toString());
 		}
-		catch (Exception e) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim fertigstellen. In diesem Fall in den Code schauen \n" + e.toString());}
+		catch (Exception e) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim fertigstellen. In diesem Fall in den Code schauen \n" + e.toString());}
     }
     
     public void addItems(JComboBox<Entry<String,String>> comboBox) {
@@ -210,7 +220,12 @@ public class GUI extends JFrame {
     
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void initialize() {
-		dbVerbindung = new DatenbankVerbindung();
+		try {
+			dbVerbindung = new DatenbankVerbindung();
+		} catch (SQLException e3) {
+			JOptionPane.showMessageDialog(neueRechnung, "Eine Verbindung mit der Datenbank konnte nicht hergestellt werden \n Datenbank überprüfen \n" + e3.toString());
+			throw new Error("Datenbankverbindung fehlgeschlagen");
+		}
 		
 		setForeground(new Color(0, 0, 0));
 		setBackground(new Color(51, 51, 51));
@@ -226,95 +241,98 @@ public class GUI extends JFrame {
 		tabbedPane.setBounds(0, 0, 792, 623);
 		contentPane.add(tabbedPane);
 		
-		NeueRechnung = new JPanel();
-		NeueRechnung.setBorder(null);
-		NeueRechnung.setBackground(new Color(204,204,204));
-		tabbedPane.addTab("Neue Rechnung", null, NeueRechnung, null);
-		NeueRechnung.setLayout(null);
+		neueRechnung = new JPanel();
+		neueRechnung.setBorder(null);
+		neueRechnung.setBackground(new Color(204,204,204));
+		tabbedPane.addTab("Neue Rechnung", null, neueRechnung, null);
+		neueRechnung.setLayout(null);
 		
 		progressBar = new JProgressBar();
 		progressBar.setBounds(113, 363, 146, 17);
-		NeueRechnung.add(progressBar);
+		neueRechnung.add(progressBar);
 		progressBar.setValue(0);
 		progressBar.setStringPainted(true);
 		
 		JButton btnffnen = new JButton("Öffnen");
 		btnffnen.setBounds(137, 404, 96, 23);
-		NeueRechnung.add(btnffnen);
+		neueRechnung.add(btnffnen);
 		
 		txtBetrag = new JTextField();
 		txtBetrag.setBounds(10, 323, 86, 20);
-		NeueRechnung.add(txtBetrag);
+		neueRechnung.add(txtBetrag);
 		txtBetrag.setColumns(10);
 		
 		JButton btnDrucken = new JButton("Drucken");
 		btnDrucken.setBounds(10, 404, 89, 23);
-		NeueRechnung.add(btnDrucken);
+		neueRechnung.add(btnDrucken);
 		
 		JButton btnFertig = new JButton("Fertig");
 		btnFertig.setBounds(10, 360, 89, 23);
-		NeueRechnung.add(btnFertig);
+		neueRechnung.add(btnFertig);
 		
 		
 		lblBetrag = new JLabel("Betrag Netto");
 		lblBetrag.setBounds(10, 305, 110, 14);
-		NeueRechnung.add(lblBetrag);
+		neueRechnung.add(lblBetrag);
 		
 		lblBeschreibung = new JLabel("Beschreibung");
 		lblBeschreibung.setBounds(10, 210, 110, 14);
-		NeueRechnung.add(lblBeschreibung);
+		neueRechnung.add(lblBeschreibung);
 		
 		txtBeschreibung = new JTextField();
 		txtBeschreibung.setBounds(10, 224, 388, 54);
-		NeueRechnung.add(txtBeschreibung);
+		neueRechnung.add(txtBeschreibung);
 		txtBeschreibung.setColumns(10);
 		
 		txtKW = new JTextField();
 		txtKW.setBounds(10, 121, 110, 20);
-		NeueRechnung.add(txtKW);
+		neueRechnung.add(txtKW);
 		txtKW.setColumns(10);
 		
 		lblKw = new JLabel("KW");
 		lblKw.setBounds(10, 104, 110, 14);
-		NeueRechnung.add(lblKw);
+		neueRechnung.add(lblKw);
 		
 		txtRechnungsDatum = new JTextField();
 		txtRechnungsDatum.setBounds(10, 76, 110, 20);
-		NeueRechnung.add(txtRechnungsDatum);
+		neueRechnung.add(txtRechnungsDatum);
 		txtRechnungsDatum.setText(strDate);
 		txtRechnungsDatum.setColumns(10);
 		
 		lblRechnungsdatum = new JLabel("Rechnungsdatum");
 		lblRechnungsdatum.setBounds(10, 60, 135, 14);
-		NeueRechnung.add(lblRechnungsdatum);
+		neueRechnung.add(lblRechnungsdatum);
 		
 		txtBauvorhaben = new JTextField();
 		txtBauvorhaben.setBounds(10, 175, 388, 20);
-		NeueRechnung.add(txtBauvorhaben);
+		neueRechnung.add(txtBauvorhaben);
 		txtBauvorhaben.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Bauvorhaben");
 		lblNewLabel.setBounds(10, 157, 110, 14);
-		NeueRechnung.add(lblNewLabel);
+		neueRechnung.add(lblNewLabel);
 		
 		JLabel lblRechnungsnummer = new JLabel("Rechnungsnummer");
 		lblRechnungsnummer.setBounds(10, 11, 158, 14);
-		NeueRechnung.add(lblRechnungsnummer);
+		neueRechnung.add(lblRechnungsnummer);
 		
 		txtRechnungsnummer = new JTextField();
 		txtRechnungsnummer.setBounds(10, 30, 110, 20);
-		NeueRechnung.add(txtRechnungsnummer);
-		txtRechnungsnummer.setText(dbVerbindung.retrieveMaxRechnungsnummer());
+		neueRechnung.add(txtRechnungsnummer);
+		try {
+			txtRechnungsnummer.setText(dbVerbindung.retrieveNextRechnungsnummer());
+		} catch (SQLException e2) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim erfragen der nächsten Rechnungsnummer \n" + e2.toString());
+		}
 		txtRechnungsnummer.setColumns(10);
 		
 		JLabel lblKunde = new JLabel("Kunde");
 		lblKunde.setBounds(178, 11, 110, 14);
-		NeueRechnung.add(lblKunde);
+		neueRechnung.add(lblKunde);
 		
 		
 		comboBox = new JComboBox();
 		comboBox.setBounds(178, 29, 319, 21);
-		NeueRechnung.add(comboBox);
+		neueRechnung.add(comboBox);
 		
 		addItems(comboBox);
 		
@@ -329,20 +347,27 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					dbVerbindung.druckeRechnung(Integer.parseInt(txtRechnungsnummer.getText()));
-				} catch (NumberFormatException e1) {JOptionPane.showMessageDialog(NeueRechnung, "Rechnungsnummer überprüfen \n");
-				} catch (IOException e1) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim Laden der PDF Datei. Pfad überprüfen \n" + e.toString());
-				} catch (PrinterException e1) {JOptionPane.showMessageDialog(NeueRechnung, "Fehler beim Drucken. Drucker oder so überprüfen \n" + e.toString());}
+				} catch (NumberFormatException e1) {JOptionPane.showMessageDialog(neueRechnung, "Rechnungsnummer überprüfen \n");
+				} catch (IOException e1) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim Laden der PDF Datei. Pfad überprüfen \n" + e1.toString());
+				} catch (PrinterException e1) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim Drucken. Drucker oder so überprüfen \n" + e1.toString());
+				} catch (SQLException e1) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim erfragen der Daten aus der Datenbank \n" + e1.toString());
+				}
 			}
 		});
 		btnffnen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dbVerbindung.öffneRechnung(Integer.parseInt(txtRechnungsnummer.getText()));
+				try {
+					dbVerbindung.öffneRechnung(Integer.parseInt(txtRechnungsnummer.getText()));
+				} catch (NumberFormatException e1) {JOptionPane.showMessageDialog(neueRechnung, "Rechnungsnummer überprüfen \n");
+				} catch (SQLException e1) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim erfragen des Pfades der PDF Datei \n" + e1.toString());
+				} catch (IOException e1) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim öffnen. Datei nicht vorhanden \n" + e1.toString());
+				}
 			}
 		});
 		
-		JPanel Suchen = new JPanel();
-		tabbedPane.addTab("Suchen", null, Suchen, null);
-		Suchen.setLayout(null);
+		suchen = new JPanel();
+		tabbedPane.addTab("Suchen", null, suchen, null);
+		suchen.setLayout(null);
 		
 		JButton btnSuchen = new JButton("Suchen");
 		JTextField txtSuchen = new JTextField();
@@ -354,53 +379,56 @@ public class GUI extends JFrame {
 			}
 		});
 		txtSuchen.setBounds(10, 11, 523, 20);
-		Suchen.add(txtSuchen);
+		suchen.add(txtSuchen);
 		txtSuchen.setColumns(10);
 		
 		
 		btnSuchen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tableErgebnis.setModel(DbUtils.resultSetToTableModel(dbVerbindung.search(txtSuchen.getText(), Suchen)));
+				try {
+					tableErgebnis.setModel(DbUtils.resultSetToTableModel(dbVerbindung.search(txtSuchen.getText())));
+				} catch (SQLException e1) {JOptionPane.showMessageDialog(suchen, "Kein Ergebnis \n" + e1.toString());
+				}
 			}
 		});
 		btnSuchen.setBounds(543, 10, 89, 23);
-		Suchen.add(btnSuchen);
+		suchen.add(btnSuchen);
 		
 		tableErgebnis = new JTable();
 		JScrollPane scrollPane = new JScrollPane(tableErgebnis);
 		scrollPane.setBounds(10, 76, 749, 450);
-		Suchen.add(scrollPane);
+		suchen.add(scrollPane);
 		
 		String[] monate = {"Januar", "Februar", "März", "April", "Mai", "Juni","Juli", "Augusut","September","Oktober","November","Dezember"};
 		Integer[] jahre = {2019,2020};
 		
 		JLabel lblUmsatzVon = new JLabel("Umsatz von ");
 		lblUmsatzVon.setBounds(10, 537, 104, 29);
-		Suchen.add(lblUmsatzVon);
+		suchen.add(lblUmsatzVon);
 		
 		JComboBox<String> monatVon = new JComboBox(monate);
 		monatVon.setBounds(91, 540, 111, 22);
-		Suchen.add(monatVon);
+		suchen.add(monatVon);
 		
 		JComboBox<Integer> jahrVon = new JComboBox(jahre);
 		jahrVon.setBounds(212, 540, 95, 22);
-		Suchen.add(jahrVon);
+		suchen.add(jahrVon);
 		
 		JLabel lblBis = new JLabel("bis");
 		lblBis.setBounds(317, 544, 46, 14);
-		Suchen.add(lblBis);
+		suchen.add(lblBis);
 		
 		JComboBox<String >monatBis = new JComboBox(monate);
 		monatBis.setBounds(347, 540, 111, 22);
-		Suchen.add(monatBis);
+		suchen.add(monatBis);
 		
 		JComboBox<Integer> jahrBis = new JComboBox(jahre);
 		jahrBis.setBounds(468, 540, 95, 22);
-		Suchen.add(jahrBis);
+		suchen.add(jahrBis);
 		
 		umsatzErgebnis = new JTextField();
 		umsatzErgebnis.setBounds(635, 541, 124, 20);
-		Suchen.add(umsatzErgebnis);
+		suchen.add(umsatzErgebnis);
 		umsatzErgebnis.setColumns(10);
 		
 		JButton btnPfeil = new JButton("->");
@@ -412,21 +440,25 @@ public class GUI extends JFrame {
 				jahrV =  (Integer)jahrVon.getSelectedItem();
 				monatB =  (String)monatBis.getSelectedItem();
 				jahrB =  (Integer)jahrBis.getSelectedItem();
-				float umsatz = dbVerbindung.getUmsatz(monatV,jahrV,monatB,jahrB);
+				float umsatz = 0;
+				try {
+					umsatz = dbVerbindung.getUmsatz(monatV,jahrV,monatB,jahrB);
+				} catch (SQLException e1) {JOptionPane.showMessageDialog(suchen, "Fehler beim erfragen des Umsatzes \n In dem Fall besteht ein Problem mit der Datenbank \n" + e1.toString());}
+				
 				umsatzErgebnis.setText(String.valueOf(umsatz));
 			}
 		});
 		btnPfeil.setBounds(573, 540, 52, 23);
-		Suchen.add(btnPfeil);
+		suchen.add(btnPfeil);
 		
 		JButton btnQuery = new JButton("Query");
 		btnQuery.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tableErgebnis.setModel(DbUtils.resultSetToTableModel(dbVerbindung.searchByQuery(txtSearchQuery.getText(), Suchen)));
+				tableErgebnis.setModel(DbUtils.resultSetToTableModel(dbVerbindung.searchByQuery(txtSearchQuery.getText(), suchen)));
 			}
 		});
 		btnQuery.setBounds(543, 42, 89, 23);
-		Suchen.add(btnQuery);
+		suchen.add(btnQuery);
 		
 		txtSearchQuery = new JTextField();
 		txtSearchQuery.addKeyListener(new KeyAdapter() {
@@ -437,7 +469,7 @@ public class GUI extends JFrame {
 			}
 		});
 		txtSearchQuery.setBounds(10, 42, 523, 20);
-		Suchen.add(txtSearchQuery);
+		suchen.add(txtSearchQuery);
 		txtSearchQuery.setColumns(10);
 		
 		bearbeiten = new JPanel();
