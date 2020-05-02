@@ -85,6 +85,9 @@ public class WordDocument {
         File finalTemplate = new File("D:\\Benutzer\\Desktop\\Rechnungen\\Vorlagen\\Vorlage " + neueVorlage.getKundennummer() + ".docx");
         Docx4J.save(wordMLPackage, finalTemplate,0);
         
+        absoluteFilePath = finalTemplate.getAbsolutePath();
+        fileDirectory = finalTemplate.getParent();
+        
         System.out.println("finished creating new Template " + neueVorlage.getKundennummer() + " " + neueVorlage.getKundenname());
         
     }

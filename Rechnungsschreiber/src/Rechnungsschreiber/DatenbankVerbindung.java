@@ -243,50 +243,36 @@ public class DatenbankVerbindung {
 		return umsatz;
 	}
 
-	public ResultSet searchByQuery(String query, JPanel suchen) {
+	public ResultSet searchByQuery(String query, JPanel suchen) throws SQLException {
 		Statement stmt = null;
-		
-		try {
-			stmt = conn.createStatement();
-			return stmt.executeQuery(query);
-		} catch (SQLException e) {
-			throw new Error("Problem", e);
-		}
+		stmt = conn.createStatement();
+		return stmt.executeQuery(query);
 	}
 	
-	public HashMap<String,String> retrieveKundennameUndNummer(){
+	public HashMap<String,String> retrieveKundennameUndNummer() throws SQLException{
 		HashMap<String,String> Map = new HashMap<String,String>();
 		
 		Statement stmt = null;
 		String query = "select kundenname,kundennummer from kunde";
 		ResultSet rs;
-		try {
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(query);
-			while (rs.next()) {
-				Map.put(rs.getString(1),rs.getString(2));
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		stmt = conn.createStatement();
+		rs = stmt.executeQuery(query);
+		while (rs.next()) {
+			Map.put(rs.getString(1),rs.getString(2));
 		}
 		return Map;
 	}
 
-	public void insertNewKunde(TemplateInfo neueVorlage) {
+	public void insertNewKunde(TemplateInfo neueVorlage) throws SQLException {
 		Statement stmt = null;
 		String Query = "insert into Kunde values('"+neueVorlage.getKundennummer()+"','"+neueVorlage.getKundenname()+"','"+neueVorlage.getKundenStraße()+"',"
 				+ "'"+neueVorlage.getKundenPlz()+"','"+neueVorlage.getKundenOrt()+"')";	
-		try {
 			stmt = conn.createStatement();
 			int m = stmt.executeUpdate(Query);	
 			if(m == 1)
 				System.out.println("inserted Row to Rechnung:" + Query);
 			else
 				System.out.println("insertion failed");
-		} catch (SQLException e) {
-			System.err.println(e);
-		}
 	} 
 		
 }

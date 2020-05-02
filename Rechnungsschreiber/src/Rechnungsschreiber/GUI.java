@@ -111,6 +111,9 @@ public class GUI extends JFrame {
 			dokument.generateNewTemplate(neueVorlage);
 			dbVerbindung.insertNewKunde(neueVorlage);
 		} catch (Docx4JException e) {JOptionPane.showMessageDialog(neuerKunde, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(neuerKunde, "Fehler beim einfügen des neuen Templates in die Datenbank \n Vorlage wurde wieder gelöscht \n" + e.toString());
+			new File(dokument.getDocxAbsoulteFilePath()).delete();
 		} catch (Exception e) {JOptionPane.showMessageDialog(neuerKunde, "Fehler beim erstellen der Vorlage in dem Fall Eingabe überprüfen \n oder in den code schauen \n" + e.toString());
 		}
     }
@@ -198,7 +201,8 @@ public class GUI extends JFrame {
 		catch (Docx4JException e) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());} 
 		catch (FileNotFoundException e) {JOptionPane.showMessageDialog(neueRechnung, "Fehler. Template nicht vorhanden \n" + e.toString());}
 		catch (IOException | InterruptedException e) {
-			 if(new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".docx").delete())
+			 //if(new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".docx").delete())
+			if(new File(dokument.getDocxAbsoulteFilePath()).delete())
 				 JOptionPane.showMessageDialog(neueRechnung, "Fehler beim konvertieren. Word Datei wurde wieder gelöscht \n" + e.toString());
 			 else
 				 JOptionPane.showMessageDialog(neueRechnung, "Fehler beim konvertieren. Word Datei konnte nicht gelöscht werden \n" + e.toString());
@@ -212,7 +216,11 @@ public class GUI extends JFrame {
     }
     
     public void addItems(JComboBox<Entry<String,String>> comboBox) {
-    	HashMap<String,String> KundenNameNummer = dbVerbindung.retrieveKundennameUndNummer();
+    	HashMap<String, String> KundenNameNummer = null;
+		try {
+			KundenNameNummer = dbVerbindung.retrieveKundennameUndNummer();
+		} catch (SQLException e) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim erstellen der ComboBox. Datenbanküberprüfen \n" + e.toString());
+		}
     	for(Entry<String,String> m : KundenNameNummer.entrySet()) {
     		comboBox.addItem(m);
     	}
@@ -454,7 +462,10 @@ public class GUI extends JFrame {
 		JButton btnQuery = new JButton("Query");
 		btnQuery.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tableErgebnis.setModel(DbUtils.resultSetToTableModel(dbVerbindung.searchByQuery(txtSearchQuery.getText(), suchen)));
+				try {
+					tableErgebnis.setModel(DbUtils.resultSetToTableModel(dbVerbindung.searchByQuery(txtSearchQuery.getText(), suchen)));
+				} catch (SQLException e1) {JOptionPane.showMessageDialog(suchen, "Query fehlerhaft \n" + e1.toString());
+				}
 			}
 		});
 		btnQuery.setBounds(543, 42, 89, 23);
