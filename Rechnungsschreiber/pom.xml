@@ -3,7 +3,6 @@
   <groupId>Rechnungsschreiber</groupId>
   <artifactId>Rechnungsschreiber</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>war</packaging>
  
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -48,12 +47,30 @@
 </dependency>
 
 <!-- Runtime, com.sun.xml.bind module -->
-<dependency>
-    <groupId>org.glassfish.jaxb</groupId>
-    <artifactId>jaxb-runtime</artifactId>
-    <version>2.3.2</version>
-</dependency>
+		<dependency>
+    		<groupId>org.glassfish.jaxb</groupId>
+    		<artifactId>jaxb-runtime</artifactId>
+    		<version>2.3.2</version>
+		</dependency>
  
+ 	
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-compress</artifactId>
+    <version>1.20</version>
+</dependency>
+
+<dependency>
+    <groupId>com.documents4j</groupId>
+    <artifactId>documents4j-local</artifactId>
+    <version>1.0.3</version>
+</dependency>
+<dependency>
+    <groupId>com.documents4j</groupId>
+    <artifactId>documents4j-transformer-msoffice-word</artifactId>
+    <version>1.0.3</version>
+</dependency>
+ 	
     </dependencies>
   
   <build>
@@ -81,6 +98,7 @@
         </archive>
       </configuration>
     </plugin>
+
     </plugins>
   </build>
 </project>

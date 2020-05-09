@@ -200,7 +200,7 @@ public class GUI extends JFrame {
 		} 
 		catch (Docx4JException e) {JOptionPane.showMessageDialog(neueRechnung, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());} 
 		catch (FileNotFoundException e) {JOptionPane.showMessageDialog(neueRechnung, "Fehler. Template nicht vorhanden \n" + e.toString());}
-		catch (IOException | InterruptedException e) {
+		catch (IOException e) {
 			 //if(new File("D:\\Benutzer\\Desktop\\Rechnungen\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".docx").delete())
 			if(new File(dokument.getDocxAbsoulteFilePath()).delete())
 				 JOptionPane.showMessageDialog(neueRechnung, "Fehler beim konvertieren. Word Datei wurde wieder gelöscht \n" + e.toString());
