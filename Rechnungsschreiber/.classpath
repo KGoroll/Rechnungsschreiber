@@ -29,5 +29,7 @@
 	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/ucp.jar"/>
 	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/xdb.jar"/>
 	<classpathentry kind="lib" path="resources/rs2xml/rs2xml.jar"/>
+	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX14"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

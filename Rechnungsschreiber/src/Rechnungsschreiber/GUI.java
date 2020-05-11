@@ -81,7 +81,7 @@ public class GUI extends JFrame {
     	initialize();
     }
  
-    public static void main(String[] args) throws Exception {
+/*    public static void main(String[] args) throws Exception {
 		BasicConfigurator.configure();
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -94,7 +94,7 @@ public class GUI extends JFrame {
 			}
 		}); 
 		
-	}
+	} */
     
     private void addNewTemplate() {
     	WordDocument dokument = new WordDocument(new RechnungsInfo());

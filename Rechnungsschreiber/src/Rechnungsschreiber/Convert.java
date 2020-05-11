@@ -22,7 +22,6 @@ public class Convert {
 		  runConvert();
 	  }	  
 	  
-	  
 	 /* public void runConvert() throws IOException, InterruptedException {
 		System.out.println("Started Converting");
 		pathToTemplate = dokument.getDocxAbsoulteFilePath();
