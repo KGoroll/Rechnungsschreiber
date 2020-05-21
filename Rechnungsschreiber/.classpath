@@ -18,18 +18,10 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX11"/>
 	<classpathentry kind="lib" path="resources"/>
-	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/ojdbc10.jar"/>
-	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/ons.jar"/>
-	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/oraclepki.jar"/>
-	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/orai18n.jar"/>
-	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/osdt_cert.jar"/>
-	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/osdt_core.jar"/>
-	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/simplefan.jar"/>
-	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/ucp.jar"/>
-	<classpathentry kind="lib" path="D:/Benutzer/Desktop/Rechnungssoftware/Datenbank/ojdbc10-full/xdb.jar"/>
 	<classpathentry kind="lib" path="resources/rs2xml/rs2xml.jar"/>
 	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX14"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Oracle Database"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

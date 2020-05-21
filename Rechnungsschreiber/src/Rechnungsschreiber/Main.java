@@ -2,6 +2,8 @@ package Rechnungsschreiber;
 
 import java.io.IOException;
 
+import org.apache.log4j.BasicConfigurator;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -22,14 +24,21 @@ public class Main extends Application {
 	
 	public void mainWindow() {
 		try {
-			FXMLLoader loader = new FXMLLoader(Main.class.getResource("Rechnungsschreiber.fxml"));
+			FXMLLoader loader = new FXMLLoader(Main.class.getClassLoader().getResource("MainWindow.fxml"));
 			AnchorPane pane = loader.load();
 			
 			primaryStage.setMinHeight(400.00);
 			primaryStage.setMinWidth(500.00);
 			
+			MainWindowController controller = loader.getController();
+			controller.setMain(this);
+			
+			
 			Scene scene = new Scene(pane);
+			
 			primaryStage.setScene(scene);
+			primaryStage.show();
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -37,6 +46,7 @@ public class Main extends Application {
 	}
 	
 	public static void main(String[] args) {
+		BasicConfigurator.configure();
 		launch(args);
 	}
 
