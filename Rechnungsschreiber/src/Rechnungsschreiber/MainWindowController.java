@@ -8,18 +8,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import net.proteanit.sql.DbUtils;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.Tab;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
 public class MainWindowController {
@@ -33,7 +31,15 @@ public class MainWindowController {
 	@FXML private TextField beschreibung;
 	@FXML private ComboBox<Entry<String,String>> kunde;
 	@FXML private DatePicker rechnungsdatum;
-	@FXML private Tab neueRechnung;
+	@FXML private TextField kundennummer;
+	@FXML private TextField kundenName;
+	@FXML private TextField kundenStraße;
+	@FXML private TextField kundenPlz;
+	@FXML private TextField kundenOrt;
+	@FXML private TextField sucheInTabelle;
+	@FXML private TableView übersichtTabelle;
+	@FXML private RadioButton radioKundeIsFirma;
+	@FXML private RadioButton radioKundeIsPrivat;
 	
 	public Main main;
 	private DatenbankVerbindung dbVerbindung;
@@ -46,7 +52,7 @@ public class MainWindowController {
 			alert.show();
 			throw new Error("Datenbankverbindung fehlgeschlagen");
 		}
-		
+		übersichtTabelle.setModel(DbUtils.resultSetToTableModel(dbVerbindung.search(sucheInTabelle.getText())));
 		addItems(kunde);
 	}
 	
@@ -107,8 +113,8 @@ public class MainWindowController {
 	}
 	
 	//Zum kopieren
-	Alert alert = new Alert(AlertType.ERROR, );
-	alert.show()
+	//Alert alert = new Alert(AlertType.ERROR, );
+	//alert.show()
 	
 	public void öffneRechnung() {
 		
@@ -118,7 +124,34 @@ public class MainWindowController {
 		
 	}
 	
-	 public void addItems(ComboBox<Entry<String,String>> comboBox) {
+	public void addNewTemplate() {
+	    	WordDocument dokument = new WordDocument(new RechnungsInfo());
+	    	TemplateInfo neueVorlage = new TemplateInfo();
+			
+			neueVorlage.setKundennummer(kundennummer.getText());
+			neueVorlage.setKundenname(kundenName.getText());
+			neueVorlage.setKundenStraße(kundenStraße.getText());
+			neueVorlage.setKundenPlz(kundenPlz.getText());
+			neueVorlage.setKundenOrt(kundenOrt.getText());
+			neueVorlage.setIsFirma(radioKundeIsFirma.isSelected());
+			
+			try {
+				dokument.generateNewTemplate(neueVorlage);
+				dbVerbindung.insertNewKunde(neueVorlage);
+			} catch (Docx4JException e) {
+				Alert alert = new Alert(AlertType.ERROR, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());
+				alert.show();
+			} catch (SQLException e) {
+				Alert alert = new Alert(AlertType.ERROR,"Fehler beim einfügen des neuen Templates in die Datenbank \n Vorlage wurde wieder gelöscht \n" + e.toString() );
+				alert.show();
+				new File(dokument.getDocxAbsoulteFilePath()).delete();
+			} catch (Exception e) {
+				Alert alert = new Alert(AlertType.ERROR, "Fehler beim erstellen der Vorlage in dem Fall Eingabe überprüfen \n oder in den code schauen \n" + e.toString());
+				alert.show();
+			}
+	}
+	
+	public void addItems(ComboBox<Entry<String,String>> comboBox) {
 	    	HashMap<String, String> KundenNameNummer = null;
 			try {
 				KundenNameNummer = dbVerbindung.retrieveKundennameUndNummer();
