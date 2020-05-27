@@ -33,7 +33,6 @@ public class Main extends Application {
 			MainWindowController controller = loader.getController();
 			controller.setMain(this);
 			
-			
 			Scene scene = new Scene(pane);
 			
 			primaryStage.setScene(scene);

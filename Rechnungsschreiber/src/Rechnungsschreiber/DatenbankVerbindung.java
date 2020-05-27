@@ -208,7 +208,7 @@ public class DatenbankVerbindung {
 		return nummer;
 	}
 	
-	public float getUmsatz(String monatV, int jahrV, String monatB, int jahrB) throws SQLException {
+	public int getUmsatz(String monatV, int jahrV, String monatB, int jahrB) throws SQLException {
 		HashMap<String,String> monatZuKalenderWocheVon = getMonatZuKalenderWocheVon();
 		HashMap<String,String> monatZuKalenderWocheBis = getMonatZuKalenderWocheBis();
 		
@@ -239,7 +239,7 @@ public class DatenbankVerbindung {
 		stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery(query.toString());
 		rs.next();
-		float umsatz = rs.getFloat(1);
+		int umsatz = rs.getInt(1);
 		return umsatz;
 	}
 
