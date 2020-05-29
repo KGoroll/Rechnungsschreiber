@@ -81,7 +81,7 @@ public class GUI extends JFrame {
     	initialize();
     }
  
-/*    public static void main(String[] args) throws Exception {
+   public static void main(String[] args) throws Exception {
 		BasicConfigurator.configure();
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -94,7 +94,7 @@ public class GUI extends JFrame {
 			}
 		}); 
 		
-	} */
+	} 
     
     private void addNewTemplate() {
     	WordDocument dokument = new WordDocument(new RechnungsInfo());
@@ -407,7 +407,7 @@ public class GUI extends JFrame {
 		scrollPane.setBounds(10, 76, 749, 450);
 		suchen.add(scrollPane);
 		
-		String[] monate = {"Januar", "Februar", "März", "April", "Mai", "Juni","Juli", "Augusut","September","Oktober","November","Dezember"};
+		String[] monate = {"Januar", "Februar", "März", "April", "Mai", "Juni","Juli", "August","September","Oktober","November","Dezember"};
 		Integer[] jahre = {2019,2020};
 		
 		JLabel lblUmsatzVon = new JLabel("Umsatz von ");
@@ -630,6 +630,10 @@ public class GUI extends JFrame {
 		neuerKunde.add(btnNeu);
 		
 		JButton btnÖffneVorlage = new JButton("Öffne Vorlage");
+		btnÖffneVorlage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnÖffneVorlage.setBounds(237, 373, 106, 23);
 		neuerKunde.add(btnÖffneVorlage);
 		

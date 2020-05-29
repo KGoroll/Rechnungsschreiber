@@ -18,6 +18,7 @@ import com.sun.javafx.charts.Legend;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -26,6 +27,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.CheckBox;
@@ -34,10 +36,13 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.util.Callback;
@@ -70,6 +75,7 @@ public class MainWindowController {
     @FXML private NumberAxis yAxis;
     @FXML private CheckBox checkUmsatz2019;
     @FXML private CheckBox checkUmsatz2020;
+    @FXML private TabPane tabPane;
 	private ObservableList<ObservableList> data;
 	
 	public Main main;
@@ -140,7 +146,7 @@ public class MainWindowController {
 		    }
 		}
 		
-		
+		getSelectedCell();
 	}
 	
 	//Zum kopieren
@@ -162,6 +168,11 @@ public class MainWindowController {
 			sum += umsatz;
 		}
 	    umsatzChart.getData().add(series);
+	    
+	    for (Data<String, Number> entry : series.getData()) {                
+            Tooltip t = new Tooltip(entry.getYValue().toString());
+            Tooltip.install(entry.getNode(), t);
+        }
 	}
 	
 	public void searchTable() {
@@ -199,9 +210,22 @@ public class MainWindowController {
 		}	
 	}
 
-	public void getSelectedRow() {
-		//TODO
-		//ObservableList test = übersichtTabelle.getSelectionModel().getSelectedItem();
+	public void getSelectedCell() {
+		
+		ObservableList selectedCells = übersichtTabelle.getSelectionModel().getSelectedCells();
+
+		selectedCells.addListener(new ListChangeListener() {
+		    @Override
+		    public void onChanged(Change c) {
+		    	TablePosition tablePosition = (TablePosition) selectedCells.get(0);
+		        Object val = tablePosition.getTableColumn().getCellData(tablePosition.getRow());
+		        if(tablePosition.getTableColumn().getText().equals("RECHNUNGSNR")) {
+		        	rechnungsnummer.setText((String) val);
+		        	fillRechnungsFeld();
+		        	tabPane.getSelectionModel().selectNext();
+		        }
+		    }    
+		});
 	}
 	
 	public void fertigstellen() {
@@ -288,8 +312,6 @@ public class MainWindowController {
 		}
 	}
 	
-	
-	
 	public void öffneRechnung() {
 		try {
 			
@@ -306,7 +328,6 @@ public class MainWindowController {
 			alert.show();
 		}
 	}
-
 	
 	public void fillRechnungsFeld() {
 		 WordDocument doc = null;

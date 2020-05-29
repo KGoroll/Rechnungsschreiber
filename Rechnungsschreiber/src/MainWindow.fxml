@@ -19,7 +19,7 @@
 
 <AnchorPane maxHeight="750.0" maxWidth="1200.0" prefHeight="587.0" prefWidth="869.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Rechnungsschreiber.MainWindowController">
    <children>
-      <TabPane maxHeight="750.0" maxWidth="1200.0" prefHeight="596.0" prefWidth="902.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TabPane fx:id="tabPane" maxHeight="750.0" maxWidth="1200.0" prefHeight="596.0" prefWidth="902.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
           <Tab text="Übersicht">
             <content>
