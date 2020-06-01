@@ -1,5 +1,6 @@
 package Rechnungsschreiber;
 
+import java.awt.Desktop;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +21,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -30,21 +33,27 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -68,14 +77,15 @@ public class MainWindowController {
 	@FXML private TableView übersichtTabelle;
 	@FXML private RadioButton radioKundeIsFirma;
 	@FXML private RadioButton radioKundeIsPrivat;
-	@FXML private ProgressBar progressBarFertig;
-	@FXML private ProgressIndicator progressIndicator;
+	@FXML private ProgressIndicator progress;
 	@FXML private LineChart<String,Number> umsatzChart;
 	@FXML private CategoryAxis xAxis;
     @FXML private NumberAxis yAxis;
     @FXML private CheckBox checkUmsatz2019;
     @FXML private CheckBox checkUmsatz2020;
     @FXML private TabPane tabPane;
+    @FXML private Tab neueRechnung;
+    @FXML private TextField rechnungDirectoryPath;
 	private ObservableList<ObservableList> data;
 	
 	public Main main;
@@ -112,8 +122,6 @@ public class MainWindowController {
 			alert.show();
 		}
 		
-		progressBarFertig.setProgress(0.0);
-		
 		try {
 			fillChart(2019);
 			fillChart(2020);
@@ -147,11 +155,21 @@ public class MainWindowController {
 		}
 		
 		getSelectedCell();
+		
 	}
+
+	/*
+	 * ein Button actionhandler hier drauf setzen 
+	public void setRechnungPath(){
+		final DirectoryChooser rechnungDirectorychooser = new DirectoryChooser();
+		
+		File file = rechnungDirectorychooser.showDialog(tabPane.getScene().getWindow());
+		
+		if(file != null)
+			rechnungDirectoryPath.setText(file.getAbsolutePath());
+
+	} */
 	
-	//Zum kopieren
-	//Alert alert = new Alert(AlertType.ERROR, );
-	//alert.show();
 	
 	public void fillChart(int year) throws SQLException {
 		HashMap<String,Integer> monatZuUmsatz = new HashMap<String,Integer>();
@@ -229,9 +247,8 @@ public class MainWindowController {
 	}
 	
 	public void fertigstellen() {
+		progress.setVisible(true);
     	WordDocument dokument = new WordDocument(new RechnungsInfo());
-    	
-    	progressBarFertig.setProgress(0.1);
     	
 		dokument.getRechnungsDaten().setRechnungsNr(rechnungsnummer.getText());
 		String datum = rechnungsdatum.getValue().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
@@ -241,7 +258,6 @@ public class MainWindowController {
 		dokument.getRechnungsDaten().setBetrag(betrag.getText());
 		dokument.getRechnungsDaten().setBeschreibung(beschreibung.getText());
 		dokument.getRechnungsDaten().setKundennummer(kunde.getValue().getValue());
-		progressBarFertig.setProgress(0.25);
 		erstelleNeueRechnung(dokument); 
 		
 		try {
@@ -257,12 +273,9 @@ public class MainWindowController {
 	    try {
 	    	
 			dokument.generateDocxFileFromTemplate();
-			progressBarFertig.setProgress(0.5);
 			convert = new Convert(dokument);
-			progressBarFertig.setProgress(0.85);
 			//dbVerbindung.insertNeueRechnung(dokument,convert);
-			progressBarFertig.setProgress(1.0);
-			
+			progress.setVisible(false);
 		} 
 		catch (Docx4JException e) {
 			Alert alert = new Alert(AlertType.ERROR, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());
@@ -325,6 +338,19 @@ public class MainWindowController {
 			alert.show();
 		} catch (IOException e1) {
 			Alert alert = new Alert(AlertType.ERROR, "Fehler beim öffnen. Datei nicht vorhanden \n" + e1.toString());
+			alert.show();
+		}
+	}
+	
+	public void öffneVorlage() {
+		String kundennummer = this.kundennummer.getText();
+		String pathToTemplate = "D:\\Benutzer\\Desktop\\Rechnungen\\Vorlagen\\Vorlage " + kundennummer + ".docx";
+		File file = new File(pathToTemplate);
+		Desktop desktop = Desktop.getDesktop();
+		try {
+			desktop.open(file);
+		} catch (Exception e) {
+			Alert alert = new Alert(AlertType.ERROR, "Fehler beim öffnen. Vorlage nicht vorhanden \n" + e.toString());
 			alert.show();
 		}
 	}
