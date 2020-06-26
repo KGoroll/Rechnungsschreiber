@@ -34,6 +34,7 @@ public class Convert {
 	  } */
 	  
 	  public void runConvert() throws IOException{
+		  System.out.println("Here");
 		  pathToTemplate = dokument.getDocxAbsoulteFilePath();
 		  pathToOutput = dokument.getFileDirectory() + "\\Rechnung " + dokument.getRechnungsDaten().getRechnungsNr() + ".pdf";
 		  
@@ -41,9 +42,13 @@ public class Convert {
 	        File outputFile = new File(pathToOutput);
 	            InputStream docxInputStream = new FileInputStream(inputWord);
 	            OutputStream outputStream = new FileOutputStream(outputFile);
+	            System.out.println("Here2");
 	            IConverter converter = LocalConverter.builder().build();
+	            System.out.println("Here3");
 	            converter.convert(docxInputStream).as(DocumentType.DOCX).to(outputStream).as(DocumentType.PDF).execute();
+	            System.out.println("Here4");
 	            outputStream.close();
+	            docxInputStream.close();
 	            System.out.println("success");
 	  }  
 	  

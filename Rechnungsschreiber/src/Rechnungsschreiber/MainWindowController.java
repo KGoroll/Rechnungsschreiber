@@ -21,8 +21,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -33,11 +31,9 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
@@ -46,14 +42,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -171,6 +163,7 @@ public class MainWindowController {
 	} */
 	
 	
+	@SuppressWarnings("unused")
 	public void fillChart(int year) throws SQLException {
 		HashMap<String,Integer> monatZuUmsatz = new HashMap<String,Integer>();
 		float sum = 0;
@@ -196,6 +189,8 @@ public class MainWindowController {
 	public void searchTable() {
 		ResultSet rs = null;
 		data = FXCollections.observableArrayList();
+		übersichtTabelle.getItems().clear();
+		übersichtTabelle.getColumns().clear();
 		try {
 		rs = dbVerbindung.search(sucheInTabelle.getText());
 		for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
@@ -247,7 +242,6 @@ public class MainWindowController {
 	}
 	
 	public void fertigstellen() {
-		progress.setVisible(true);
     	WordDocument dokument = new WordDocument(new RechnungsInfo());
     	
 		dokument.getRechnungsDaten().setRechnungsNr(rechnungsnummer.getText());
@@ -262,20 +256,21 @@ public class MainWindowController {
 		
 		try {
 			rechnungsnummer.setText(dbVerbindung.retrieveNextRechnungsnummer());
+			//fillChart(2019);
+			//fillChart(2020);
 		} catch (SQLException e2) {
 			Alert alert = new Alert(AlertType.ERROR, "Fehler beim erfragen der nächsten Rechnungsnummer \n" + e2.toString());
 			alert.show();
 		}
    }
 	
+	@SuppressWarnings("unused")
 	public void erstelleNeueRechnung(WordDocument dokument) {
 	    Convert convert = null;
 	    try {
-	    	
 			dokument.generateDocxFileFromTemplate();
 			convert = new Convert(dokument);
-			//dbVerbindung.insertNeueRechnung(dokument,convert);
-			progress.setVisible(false);
+			dbVerbindung.insertNeueRechnung(dokument,convert);
 		} 
 		catch (Docx4JException e) {
 			Alert alert = new Alert(AlertType.ERROR, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());
@@ -420,6 +415,8 @@ public class MainWindowController {
 			try {
 				dokument.generateNewTemplate(neueVorlage);
 				dbVerbindung.insertNewKunde(neueVorlage);
+				addItems(kunde);
+				
 			} catch (Docx4JException e) {
 				Alert alert = new Alert(AlertType.ERROR, "Fehler beim Laden des Templates oder beim speichern der Word Datei \n" + e.toString());
 				alert.show();
@@ -442,6 +439,7 @@ public class MainWindowController {
 				alert.show();
 			}
 			
+			comboBox.getItems().clear();
 	    	for(Entry<String,String> m : KundenNameNummer.entrySet()) {
 	    		comboBox.getItems().add(m);
 	    	}

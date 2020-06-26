@@ -25,7 +25,7 @@ import org.apache.pdfbox.printing.PDFPageable;
 public class DatenbankVerbindung {
 	
 	private Connection conn = null;
-	private String user = "KRZYSZTOF";
+	private String user = "TESTZWECKE";
 	private String pass = "Ichbinswieder1";
 	private String url = "jdbc:oracle:thin:@localhost:1521:orcl";
 	

@@ -74,8 +74,10 @@
     </dependencies>
   
   <build>
+
     <sourceDirectory>src</sourceDirectory>
     <plugins>
+    
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
@@ -84,8 +86,7 @@
         </configuration>
       </plugin>
       
-      <plugin>
-      <!-- Build an executable JAR -->
+    <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-jar-plugin</artifactId>
       <version>3.1.0</version>
@@ -99,7 +100,7 @@
       </configuration>
     </plugin>
 
-    <plugin>
+   <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.3</version>

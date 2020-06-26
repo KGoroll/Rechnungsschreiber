@@ -29,6 +29,7 @@ public class Main extends Application {
 			
 			primaryStage.setMinHeight(400.00);
 			primaryStage.setMinWidth(500.00);
+			primaryStage.setTitle("Rechnungsschreiber");
 			
 			MainWindowController controller = loader.getController();
 			controller.setMain(this);
